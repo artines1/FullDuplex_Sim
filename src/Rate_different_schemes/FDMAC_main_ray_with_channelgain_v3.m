@@ -34,6 +34,7 @@ ave_rate_SM_DU=zeros(K,3);
 ave_rate_SMM_DU=zeros(K,3);
 ave_rate_SRM_DU=zeros(K,3);
 ave_rate_HD_DU=zeros(K,3);
+ave_rate_MAC_DU=zeros(K,3);
 
 ave_rate_IA_UD=zeros(K,3); % column1:sum-rate column2:uplink-rate- column3:downlink-rate
 ave_rate_IM_UD=zeros(K,3);
@@ -41,6 +42,7 @@ ave_rate_SM_UD=zeros(K,3);
 ave_rate_SMM_UD=zeros(K,3);
 ave_rate_SRM_UD=zeros(K,3);
 ave_rate_HD_UD=zeros(K,3);
+ave_rate_MAC_UD=zeros(K,3);
 
 % ave_SINR_IA_DU_AP=zeros(K,1);
 % ave_SINR_IM_DU_AP=zeros(K,1);
@@ -169,6 +171,7 @@ for k=1:K % self-interference iteration
         % SMM: SINR MAX MIN
         % SRM: sum rate maximization
         % HD: half duplex
+        % MAC: MAC simulation
         % DU: down-up
         % UP: up-down
         record_traffic_IA_DU=zeros(2,total_time);%record which STA got the up/down channel in each time-slot row1:uplink row2:downlink
@@ -177,6 +180,7 @@ for k=1:K % self-interference iteration
         record_traffic_SMM_DU=zeros(2,total_time);
         record_traffic_SRM_DU=zeros(2,total_time);
         record_traffic_HD_DU=zeros(2,total_time);
+        record_traffic_MAC_DU=zeros(2, total_time);
         
         record_SINR_IA_DU=zeros(2,total_time);%record the corresponding SINR of up/down in each time-slot row1:AP(up) row2:STA(down)
         record_SINR_IM_DU=zeros(2,total_time);
@@ -184,6 +188,7 @@ for k=1:K % self-interference iteration
         record_SINR_SMM_DU=zeros(2,total_time);
         record_SINR_SRM_DU=zeros(2,total_time);
         record_SINR_HD_DU=zeros(2,total_time);
+        record_SINR_MAC_DU=zeros(2,total_time);
         
         record_traffic_IA_UD=zeros(2,total_time);
         record_traffic_IM_UD=zeros(2,total_time);
@@ -191,6 +196,7 @@ for k=1:K % self-interference iteration
         record_traffic_SMM_UD=zeros(2,total_time);
         record_traffic_SRM_UD=zeros(2,total_time);
         record_traffic_HD_UD=zeros(2,total_time);
+        record_traffic_MAC_UD=zeros(2,total_time);
         
         record_SINR_IA_UD=zeros(2,total_time);
         record_SINR_IM_UD=zeros(2,total_time);
@@ -198,6 +204,7 @@ for k=1:K % self-interference iteration
         record_SINR_SMM_UD=zeros(2,total_time);
         record_SINR_SRM_UD=zeros(2,total_time);
         record_SINR_HD_UD=zeros(2,total_time);
+        recode_SINR_MAC_UD=zeros(2,total_time);
         
         traffic_reg_first=zeros(number_STAs,1);%record traffic requirement of STAs for first transmission at each time-slot
         traffic_reg_second=zeros(number_STAs,1);%record traffic requirement of STAs for second transmission at each time-slot
@@ -239,6 +246,7 @@ for k=1:K % self-interference iteration
                     [record_traffic_SM_DU(1,t)]=fcn_SINR_Maximization_DU(transmission_first,traffic_reg_second,num_up_STA,channel_gain_temp,channel_gain_withAP_temp,noise_power,power_transmit_AP,power_transmit_STA);
                     [record_traffic_SMM_DU(1,t)]=fcn_SINR_Maxmin_DU(transmission_first,traffic_reg_second,num_up_STA,channel_gain_temp,channel_gain_withAP_temp,noise_power,power_transmit_AP,power_transmit_STA,self_interference_channel_gain_AP);
                     [record_traffic_SRM_DU(1,t)]=fcn_SumRate_Maximization_DU(transmission_first,traffic_reg_second,num_up_STA,channel_gain_temp,channel_gain_withAP_temp,noise_power,power_transmit_AP,power_transmit_STA,self_interference_channel_gain_AP);
+                    [record_traffic_MAC_DU(1,t)]=fcn_MAC_DU(transmission_first,traffic_reg_second,num_up_STA,channel_gain_temp,channel_gain_withAP_temp,power_transmit_AP,power_transmit_STA);
                 else
                     record_traffic_IA_DU(1,t)=0;
                     record_traffic_IM_DU(1,t)=0;
@@ -281,6 +289,7 @@ for k=1:K % self-interference iteration
             record_traffic_SMM_DU(2,t)=transmission_first;
             record_traffic_SRM_DU(2,t)=transmission_first;
             record_traffic_HD_DU(2,t)=transmission_first;
+            record_traffic_MAC_DU(2,t)=transmission_first;
             
             % calculate SINR based on record traffic 
             [record_SINR_IA_DU(:,t)]=fcn_SINR_calculate(record_traffic_IA_DU(:,t),power_transmit_AP,power_transmit_STA,channel_gain_withAP_temp,channel_gain_temp,noise_power,self_interference_channel_gain_AP);
@@ -289,6 +298,7 @@ for k=1:K % self-interference iteration
             [record_SINR_SMM_DU(:,t)]=fcn_SINR_calculate(record_traffic_SMM_DU(:,t),power_transmit_AP,power_transmit_STA,channel_gain_withAP_temp,channel_gain_temp,noise_power,self_interference_channel_gain_AP);
             [record_SINR_SRM_DU(:,t)]=fcn_SINR_calculate(record_traffic_SRM_DU(:,t),power_transmit_AP,power_transmit_STA,channel_gain_withAP_temp,channel_gain_temp,noise_power,self_interference_channel_gain_AP);
             [record_SINR_HD_DU(:,t)]=fcn_SINR_calculate(record_traffic_HD_DU(:,t),power_transmit_AP,power_transmit_STA,channel_gain_withAP_temp,channel_gain_temp,noise_power,self_interference_channel_gain_AP);
+            [record_SINR_MAC_DU(:,t)]=fcn_SINR_calculate(record_traffic_MAC_DU(:,t),power_transmit_AP,power_transmit_STA,channel_gain_withAP_temp,channel_gain_temp,noise_power,self_interference_channel_gain_AP);
             %% UP-DOWN
             traffic_reg_first(:,:)=0;
             traffic_reg_second(:,:)=0;
@@ -387,6 +397,7 @@ for k=1:K % self-interference iteration
         ave_rate_SMM_DU(k,:)=ave_rate_SMM_DU(k,:)+fcn_rate_calculate(record_SINR_SMM_DU);
         ave_rate_SRM_DU(k,:)=ave_rate_SRM_DU(k,:)+fcn_rate_calculate(record_SINR_SRM_DU);
         ave_rate_HD_DU(k,:)=ave_rate_HD_DU(k,:)+fcn_rate_calculate(record_SINR_HD_DU);
+        ave_rate_MAC_DU(k,:)=ave_rate_MAC_DU(k,:)+fcn_rate_calculate(record_SINR_MAC_DU);
         
         ave_rate_IA_UD(k,:)=ave_rate_IA_UD(k,:)+fcn_rate_calculate(record_SINR_IA_UD);
         ave_rate_IM_UD(k,:)=ave_rate_IM_UD(k,:)+fcn_rate_calculate(record_SINR_IM_UD);
@@ -525,7 +536,7 @@ for k=1:K % self-interference iteration
     fprintf('The k=%i /%i \n',k,K); % print simulation progress
 end
 
-ave_rate_DU_with_channelgain=[ave_rate_IA_DU ave_rate_IM_DU ave_rate_SM_DU ave_rate_SMM_DU ave_rate_SRM_DU ave_rate_HD_DU]; 
+ave_rate_DU_with_channelgain=[ave_rate_IA_DU ave_rate_IM_DU ave_rate_SM_DU ave_rate_SMM_DU ave_rate_SRM_DU ave_rate_HD_DU ave_rate_MAC_DU]; 
 ave_rate_UD_with_channelgain=[ave_rate_IA_UD ave_rate_IM_UD ave_rate_SM_UD ave_rate_SMM_UD ave_rate_SRM_UD ave_rate_HD_UD];
 % ave_SINR_DU_AP_with_channelgain=[ave_SINR_IA_DU_AP ave_SINR_IM_DU_AP ave_SINR_SM_DU_AP ave_SINR_SMM_DU_AP ave_SINR_SRM_DU_AP ave_SINR_HD_DU_AP];
 % ave_SINR_DU_STA_with_channelgain=[ave_SINR_IA_DU_STA ave_SINR_IM_DU_STA ave_SINR_SM_DU_STA ave_SINR_SMM_DU_STA ave_SINR_SRM_DU_STA ave_SINR_HD_DU_STA];
