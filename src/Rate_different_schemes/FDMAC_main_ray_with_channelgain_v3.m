@@ -182,13 +182,13 @@ for k=1:K % self-interference iteration
         record_traffic_HD_DU=zeros(2,total_time);
         record_traffic_MAC_DU=zeros(2, total_time);
         
-        record_SINR_IA_DU=zeros(2,total_time);%record the corresponding SINR of up/down in each time-slot row1:AP(up) row2:STA(down)
-        record_SINR_IM_DU=zeros(2,total_time);
-        record_SINR_SM_DU=zeros(2,total_time);
-        record_SINR_SMM_DU=zeros(2,total_time);
-        record_SINR_SRM_DU=zeros(2,total_time);
-        record_SINR_HD_DU=zeros(2,total_time);
-        record_SINR_MAC_DU=zeros(2,total_time);
+        record_SINR_IA_DU=zeros(4,total_time);%record the corresponding SINR of up/down in each time-slot row1:AP(up) row2:STA(down) row3: estimate AP(up) row4: estimate STA(down)
+        record_SINR_IM_DU=zeros(4,total_time);
+        record_SINR_SM_DU=zeros(4,total_time);
+        record_SINR_SMM_DU=zeros(4,total_time);
+        record_SINR_SRM_DU=zeros(4,total_time);
+        record_SINR_HD_DU=zeros(4,total_time);
+        record_SINR_MAC_DU=zeros(4,total_time);
         
         record_traffic_IA_UD=zeros(2,total_time);
         record_traffic_IM_UD=zeros(2,total_time);
@@ -198,13 +198,13 @@ for k=1:K % self-interference iteration
         record_traffic_HD_UD=zeros(2,total_time);
         record_traffic_MAC_UD=zeros(2,total_time);
         
-        record_SINR_IA_UD=zeros(2,total_time);
-        record_SINR_IM_UD=zeros(2,total_time);
-        record_SINR_SM_UD=zeros(2,total_time);
-        record_SINR_SMM_UD=zeros(2,total_time);
-        record_SINR_SRM_UD=zeros(2,total_time);
-        record_SINR_HD_UD=zeros(2,total_time);
-        recode_SINR_MAC_UD=zeros(2,total_time);
+        record_SINR_IA_UD=zeros(4,total_time);
+        record_SINR_IM_UD=zeros(4,total_time);
+        record_SINR_SM_UD=zeros(4,total_time);
+        record_SINR_SMM_UD=zeros(4,total_time);
+        record_SINR_SRM_UD=zeros(4,total_time);
+        record_SINR_HD_UD=zeros(4,total_time);
+        recode_SINR_MAC_UD=zeros(4,total_time);
         
         traffic_reg_first=zeros(number_STAs,1);%record traffic requirement of STAs for first transmission at each time-slot
         traffic_reg_second=zeros(number_STAs,1);%record traffic requirement of STAs for second transmission at each time-slot
