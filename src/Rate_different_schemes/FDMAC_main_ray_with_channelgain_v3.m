@@ -15,6 +15,7 @@ total_time=100;% total numbers of iterations in one Monte_Carlo trial
 pro_up=0.8; % uplink traffic probability
 pro_down=0.8;% downlink traffic probability
 Monte_Carlo_T=1000;% total numbers of Monte_Carlo trials
+Target_BER = 0.1;
 
 %% initial up/down probability for each STA
 pro_STAs=zeros(2,number_STAs);
@@ -182,13 +183,13 @@ for k=1:K % self-interference iteration
         record_traffic_HD_DU=zeros(2,total_time);
         record_traffic_MAC_DU=zeros(2, total_time);
         
-        record_SINR_IA_DU=zeros(2,total_time);%record the corresponding SINR of up/down in each time-slot row1:AP(up) row2:STA(down)
-        record_SINR_IM_DU=zeros(2,total_time);
-        record_SINR_SM_DU=zeros(2,total_time);
-        record_SINR_SMM_DU=zeros(2,total_time);
-        record_SINR_SRM_DU=zeros(2,total_time);
-        record_SINR_HD_DU=zeros(2,total_time);
-        record_SINR_MAC_DU=zeros(2,total_time);
+        record_SINR_IA_DU=zeros(4,total_time);%record the corresponding SINR of up/down in each time-slot row1:AP(up) row2:STA(down) row3: estimate AP(up) row4: estimate STA(down)
+        record_SINR_IM_DU=zeros(4,total_time);
+        record_SINR_SM_DU=zeros(4,total_time);
+        record_SINR_SMM_DU=zeros(4,total_time);
+        record_SINR_SRM_DU=zeros(4,total_time);
+        record_SINR_HD_DU=zeros(4,total_time);
+        record_SINR_MAC_DU=zeros(4,total_time);
         
         record_traffic_IA_UD=zeros(2,total_time);
         record_traffic_IM_UD=zeros(2,total_time);
@@ -198,13 +199,13 @@ for k=1:K % self-interference iteration
         record_traffic_HD_UD=zeros(2,total_time);
         record_traffic_MAC_UD=zeros(2,total_time);
         
-        record_SINR_IA_UD=zeros(2,total_time);
-        record_SINR_IM_UD=zeros(2,total_time);
-        record_SINR_SM_UD=zeros(2,total_time);
-        record_SINR_SMM_UD=zeros(2,total_time);
-        record_SINR_SRM_UD=zeros(2,total_time);
-        record_SINR_HD_UD=zeros(2,total_time);
-        recode_SINR_MAC_UD=zeros(2,total_time);
+        record_SINR_IA_UD=zeros(4,total_time);
+        record_SINR_IM_UD=zeros(4,total_time);
+        record_SINR_SM_UD=zeros(4,total_time);
+        record_SINR_SMM_UD=zeros(4,total_time);
+        record_SINR_SRM_UD=zeros(4,total_time);
+        record_SINR_HD_UD=zeros(4,total_time);
+        recode_SINR_MAC_UD=zeros(4,total_time);
         
         traffic_reg_first=zeros(number_STAs,1);%record traffic requirement of STAs for first transmission at each time-slot
         traffic_reg_second=zeros(number_STAs,1);%record traffic requirement of STAs for second transmission at each time-slot
@@ -390,21 +391,39 @@ for k=1:K % self-interference iteration
             
         end
         
-        % calculate rate based on SINR and sum up
-        ave_rate_IA_DU(k,:)=ave_rate_IA_DU(k,:)+fcn_rate_calculate(record_SINR_IA_DU);
-        ave_rate_IM_DU(k,:)=ave_rate_IM_DU(k,:)+fcn_rate_calculate(record_SINR_IM_DU);
-        ave_rate_SM_DU(k,:)=ave_rate_SM_DU(k,:)+fcn_rate_calculate(record_SINR_SM_DU);
-        ave_rate_SMM_DU(k,:)=ave_rate_SMM_DU(k,:)+fcn_rate_calculate(record_SINR_SMM_DU);
-        ave_rate_SRM_DU(k,:)=ave_rate_SRM_DU(k,:)+fcn_rate_calculate(record_SINR_SRM_DU);
-        ave_rate_HD_DU(k,:)=ave_rate_HD_DU(k,:)+fcn_rate_calculate(record_SINR_HD_DU);
-        ave_rate_MAC_DU(k,:)=ave_rate_MAC_DU(k,:)+fcn_rate_calculate(record_SINR_MAC_DU);
+        SINR_Boundary = fcn_GetSINRBoundary(Target_BER);
         
-        ave_rate_IA_UD(k,:)=ave_rate_IA_UD(k,:)+fcn_rate_calculate(record_SINR_IA_UD);
-        ave_rate_IM_UD(k,:)=ave_rate_IM_UD(k,:)+fcn_rate_calculate(record_SINR_IM_UD);
-        ave_rate_SM_UD(k,:)=ave_rate_SM_UD(k,:)+fcn_rate_calculate(record_SINR_SM_UD);
-        ave_rate_SMM_UD(k,:)=ave_rate_SMM_UD(k,:)+fcn_rate_calculate(record_SINR_SMM_UD);
-        ave_rate_SRM_UD(k,:)=ave_rate_SRM_UD(k,:)+fcn_rate_calculate(record_SINR_SRM_UD);
-        ave_rate_HD_UD(k,:)=ave_rate_HD_UD(k,:)+fcn_rate_calculate(record_SINR_HD_UD);
+        % calculate rate based on SINR and sum up with BER
+        ave_rate_IA_DU(k,:)=ave_rate_IA_DU(k,:)+fcn_rate_calculate_with_BER(record_SINR_IA_DU, SINR_Boundary);
+        ave_rate_IM_DU(k,:)=ave_rate_IM_DU(k,:)+fcn_rate_calculate_with_BER(record_SINR_IM_DU, SINR_Boundary);
+        ave_rate_SM_DU(k,:)=ave_rate_SM_DU(k,:)+fcn_rate_calculate_with_BER(record_SINR_SM_DU, SINR_Boundary);
+        ave_rate_SMM_DU(k,:)=ave_rate_SMM_DU(k,:)+fcn_rate_calculate_with_BER(record_SINR_SMM_DU, SINR_Boundary);
+        ave_rate_SRM_DU(k,:)=ave_rate_SRM_DU(k,:)+fcn_rate_calculate_with_BER(record_SINR_SRM_DU, SINR_Boundary);
+        ave_rate_HD_DU(k,:)=ave_rate_HD_DU(k,:)+fcn_rate_calculate_with_BER(record_SINR_HD_DU, SINR_Boundary);
+        ave_rate_MAC_DU(k,:)=ave_rate_MAC_DU(k,:)+fcn_rate_calculate_with_BER(record_SINR_MAC_DU, SINR_Boundary);
+        
+        ave_rate_IA_UD(k,:)=ave_rate_IA_UD(k,:)+fcn_rate_calculate_with_BER(record_SINR_IA_UD, SINR_Boundary);
+        ave_rate_IM_UD(k,:)=ave_rate_IM_UD(k,:)+fcn_rate_calculate_with_BER(record_SINR_IM_UD, SINR_Boundary);
+        ave_rate_SM_UD(k,:)=ave_rate_SM_UD(k,:)+fcn_rate_calculate_with_BER(record_SINR_SM_UD, SINR_Boundary);
+        ave_rate_SMM_UD(k,:)=ave_rate_SMM_UD(k,:)+fcn_rate_calculate_with_BER(record_SINR_SMM_UD, SINR_Boundary);
+        ave_rate_SRM_UD(k,:)=ave_rate_SRM_UD(k,:)+fcn_rate_calculate_with_BER(record_SINR_SRM_UD, SINR_Boundary);
+        ave_rate_HD_UD(k,:)=ave_rate_HD_UD(k,:)+fcn_rate_calculate_with_BER(record_SINR_HD_UD, SINR_Boundary);
+        
+        % calculate rate based on SINR and sum up
+        %ave_rate_IA_DU(k,:)=ave_rate_IA_DU(k,:)+fcn_rate_calculate(record_SINR_IA_DU);
+        %ave_rate_IM_DU(k,:)=ave_rate_IM_DU(k,:)+fcn_rate_calculate(record_SINR_IM_DU);
+        %ave_rate_SM_DU(k,:)=ave_rate_SM_DU(k,:)+fcn_rate_calculate(record_SINR_SM_DU);
+        %ave_rate_SMM_DU(k,:)=ave_rate_SMM_DU(k,:)+fcn_rate_calculate(record_SINR_SMM_DU);
+        %ave_rate_SRM_DU(k,:)=ave_rate_SRM_DU(k,:)+fcn_rate_calculate(record_SINR_SRM_DU);
+        %ave_rate_HD_DU(k,:)=ave_rate_HD_DU(k,:)+fcn_rate_calculate(record_SINR_HD_DU);
+        %ave_rate_MAC_DU(k,:)=ave_rate_MAC_DU(k,:)+fcn_rate_calculate(record_SINR_MAC_DU);
+        
+        %ave_rate_IA_UD(k,:)=ave_rate_IA_UD(k,:)+fcn_rate_calculate(record_SINR_IA_UD);
+        %ave_rate_IM_UD(k,:)=ave_rate_IM_UD(k,:)+fcn_rate_calculate(record_SINR_IM_UD);
+        %ave_rate_SM_UD(k,:)=ave_rate_SM_UD(k,:)+fcn_rate_calculate(record_SINR_SM_UD);
+        %ave_rate_SMM_UD(k,:)=ave_rate_SMM_UD(k,:)+fcn_rate_calculate(record_SINR_SMM_UD);
+        %ave_rate_SRM_UD(k,:)=ave_rate_SRM_UD(k,:)+fcn_rate_calculate(record_SINR_SRM_UD);
+        %ave_rate_HD_UD(k,:)=ave_rate_HD_UD(k,:)+fcn_rate_calculate(record_SINR_HD_UD);
         
 %         ave_SINR_IA_DU_AP(k,1)=ave_SINR_IA_DU_AP(k,1)+sum(record_SINR_IA_DU(1,:))/nnz(record_traffic_IA_DU(1,:));
 %         ave_SINR_IM_DU_AP(k,1)=ave_SINR_IM_DU_AP(k,1)+sum(record_SINR_IM_DU(1,:))/nnz(record_traffic_IM_DU(1,:));
