@@ -16,6 +16,7 @@ pro_up=0.8; % uplink traffic probability
 pro_down=0.8;% downlink traffic probability
 Monte_Carlo_T=1000;% total numbers of Monte_Carlo trials
 Target_BER = 0.1;
+global History_SINR_Data;
 
 %% initial up/down probability for each STA
 pro_STAs=zeros(2,number_STAs);
@@ -105,6 +106,8 @@ ave_rate_MAC_UD=zeros(K,3);
 for k=1:K % self-interference iteration
     self_interference_channel_gain_AP=self_interference_channel_gain_STA(1,k);% the self-interference gain in AP (dB)  
     for T=1:Monte_Carlo_T % Monte Carlo trial iteration
+        %% Initiate parameters
+        History_SINR_Data = zeros(number_STAs,number_STAs);
         %% random deploy STAs in a circle
         % uniform distribution in a circle
         u=unifrnd(0,radius,[1,number_STAs])+unifrnd(0,radius,[1,number_STAs]);
@@ -247,7 +250,7 @@ for k=1:K % self-interference iteration
                     [record_traffic_SM_DU(1,t)]=fcn_SINR_Maximization_DU(transmission_first,traffic_reg_second,num_up_STA,channel_gain_temp,channel_gain_withAP_temp,noise_power,power_transmit_AP,power_transmit_STA);
                     [record_traffic_SMM_DU(1,t)]=fcn_SINR_Maxmin_DU(transmission_first,traffic_reg_second,num_up_STA,channel_gain_temp,channel_gain_withAP_temp,noise_power,power_transmit_AP,power_transmit_STA,self_interference_channel_gain_AP);
                     [record_traffic_SRM_DU(1,t)]=fcn_SumRate_Maximization_DU(transmission_first,traffic_reg_second,num_up_STA,channel_gain_temp,channel_gain_withAP_temp,noise_power,power_transmit_AP,power_transmit_STA,self_interference_channel_gain_AP);
-                    [record_traffic_MAC_DU(1,t)]=fcn_MAC_DU(transmission_first,traffic_reg_second,num_up_STA,channel_gain_temp,channel_gain_withAP_temp,power_transmit_AP,power_transmit_STA);
+                    [record_traffic_MAC_DU(1,t)]=fcn_MAC_DU(transmission_first,traffic_reg_second,num_up_STA,channel_gain_temp,channel_gain_withAP_temp,power_transmit_AP,power_transmit_STA,t);
                 else
                     record_traffic_IA_DU(1,t)=0;
                     record_traffic_IM_DU(1,t)=0;
