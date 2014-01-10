@@ -15,8 +15,9 @@ total_time=100;% total numbers of iterations in one Monte_Carlo trial
 pro_up=0.8; % uplink traffic probability
 pro_down=0.8;% downlink traffic probability
 Monte_Carlo_T=1000;% total numbers of Monte_Carlo trials
-Target_BER = 0.1;
+Target_PER = 0.1;
 global History_SINR_Data;
+load('snrtable.mat');
 
 %% initial up/down probability for each STA
 pro_STAs=zeros(2,number_STAs);
@@ -392,9 +393,7 @@ for k=1:K % self-interference iteration
             [record_SINR_SRM_UD(:,t)]=fcn_SINR_calculate(record_traffic_SRM_UD(:,t),power_transmit_AP,power_transmit_STA,channel_gain_withAP_temp,channel_gain_temp,noise_power,self_interference_channel_gain_AP);
             [record_SINR_HD_UD(:,t)]=fcn_SINR_calculate(record_traffic_HD_UD(:,t),power_transmit_AP,power_transmit_STA,channel_gain_withAP_temp,channel_gain_temp,noise_power,self_interference_channel_gain_AP);
             
-        end
-        
-        SINR_Boundary = fcn_GetSINRBoundary(Target_BER);
+        end             
         
         % calculate rate based on SINR and sum up with BER
         ave_rate_IA_DU(k,:)=ave_rate_IA_DU(k,:)+fcn_rate_calculate_with_BER(record_SINR_IA_DU, SINR_Boundary);
