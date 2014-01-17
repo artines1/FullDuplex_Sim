@@ -4,11 +4,10 @@ function [ave_rate] = fcn_rate_calculate_with_PER(record_SINR, snrtable, packet_
 
 rate_byte_per_sec = [6 9 12 18 24 36 48 54].*1024/8;
 rate_time_cost = packet_size./rate_byte_per_sec;
+Packet_Error_Cost = 2; % packet error cost 2 second
 
 real_PER_up = 0;
 real_PER_down = 0;
-Rate_idx_up = 0;
-Rate_idx_down = 0;
 
 ave_rate=zeros(1,3);
 ave_time_cost=zeros(size(record_SINR,2),2); % column1: uplink time spend column2: down link time spend
@@ -26,13 +25,8 @@ for t=1:size(record_SINR,2)
             temp_per = 1 - (snrtable(temp_idx(i,1), 3) ^ packet_size);
             
             if temp_per <= target_PER
-                Rate_idx_up = i;
-                real_rate_idx = find(snrtable(:,1) <= record_SINR(1,t), 1, 'last') - 8 + Rate_idx_up;
-                if size(real_rate_idx, 1) == 0
-                    real_PER_up = 1;
-                else
-                    real_PER_up = 1 - (snrtable(real_rate_idx, 3) ^ packet_size);
-                end
+                Rate_idx_up = i;                
+                real_PER_up = temp_per;                
                 break;
             end
         end
@@ -62,14 +56,32 @@ for t=1:size(record_SINR,2)
     if record_SINR(1,t)~=0&&record_SINR(2,t)~=0 % up and down link simultaneously 
         ave_success_transmit(t,1)=randsrc(1,1,[1 0; 1-real_PER_up real_PER_up]);
         ave_success_transmit(t,2)=randsrc(1,1,[1 0; 1-real_PER_down real_PER_down]);
-        ave_time_cost(t,1)=ave_success_transmit(t,1) * rate_time_cost(Rate_idx_up);
-        ave_time_cost(t,2)=ave_success_transmit(t,2) * rate_time_cost(Rate_idx_down);
+        if ave_success_transmit(t,1) == 1
+            ave_time_cost(t,1)=rate_time_cost(Rate_idx_up);
+        else
+            ave_time_cost(t,1)=Packet_Error_Cost;
+        end
+        
+        if ave_success_transmit(t,2) == 1
+            ave_time_cost(t,2)=rate_time_cost(Rate_idx_down);
+        else
+            ave_time_cost(t,2)=Packet_Error_Cost;
+        end
+        
     elseif record_SINR(1,t)==0&&record_SINR(2,t)~=0 % only downlink
         ave_success_transmit(t,2)=randsrc(1,1,[1 0; 1-real_PER_down real_PER_down]);
-        ave_time_cost(t,2)=ave_success_transmit(t,2) * rate_time_cost(Rate_idx_down);
+        if ave_success_transmit(t,2) == 1
+            ave_time_cost(t,2)=rate_time_cost(Rate_idx_down);
+        else
+            ave_time_cost(t,2)=Packet_Error_Cost;
+        end
     elseif record_SINR(1,t)~=0&&record_SINR(2,t)==0% only uplink
         ave_success_transmit(t,1)=randsrc(1,1,[1 0; 1-real_PER_up real_PER_up]);
-        ave_time_cost(t,1)=ave_success_transmit(t,1) * rate_time_cost(Rate_idx_up);
+        if ave_success_transmit(t,1) == 1
+            ave_time_cost(t,1)=rate_time_cost(Rate_idx_up);
+        else
+            ave_time_cost(t,2)=Packet_Error_Cost;
+        end
     end
     
 end
