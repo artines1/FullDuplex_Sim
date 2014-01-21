@@ -15,8 +15,10 @@ total_time=100;% total numbers of iterations in one Monte_Carlo trial
 pro_up=0.8; % uplink traffic probability
 pro_down=0.8;% downlink traffic probability
 Monte_Carlo_T=1000;% total numbers of Monte_Carlo trials
-Target_BER = 0.1;
+Target_PER = 0.1;
+packet_size = 1000; %1000 bytes
 global History_SINR_Data;
+load('snrtable.mat');
 
 %% initial up/down probability for each STA
 pro_STAs=zeros(2,number_STAs);
@@ -392,25 +394,23 @@ for k=1:K % self-interference iteration
             [record_SINR_SRM_UD(:,t)]=fcn_SINR_calculate(record_traffic_SRM_UD(:,t),power_transmit_AP,power_transmit_STA,channel_gain_withAP_temp,channel_gain_temp,noise_power,self_interference_channel_gain_AP);
             [record_SINR_HD_UD(:,t)]=fcn_SINR_calculate(record_traffic_HD_UD(:,t),power_transmit_AP,power_transmit_STA,channel_gain_withAP_temp,channel_gain_temp,noise_power,self_interference_channel_gain_AP);
             
-        end
-        
-        SINR_Boundary = fcn_GetSINRBoundary(Target_BER);
+        end             
         
         % calculate rate based on SINR and sum up with BER
-        ave_rate_IA_DU(k,:)=ave_rate_IA_DU(k,:)+fcn_rate_calculate_with_BER(record_SINR_IA_DU, SINR_Boundary);
-        ave_rate_IM_DU(k,:)=ave_rate_IM_DU(k,:)+fcn_rate_calculate_with_BER(record_SINR_IM_DU, SINR_Boundary);
-        ave_rate_SM_DU(k,:)=ave_rate_SM_DU(k,:)+fcn_rate_calculate_with_BER(record_SINR_SM_DU, SINR_Boundary);
-        ave_rate_SMM_DU(k,:)=ave_rate_SMM_DU(k,:)+fcn_rate_calculate_with_BER(record_SINR_SMM_DU, SINR_Boundary);
-        ave_rate_SRM_DU(k,:)=ave_rate_SRM_DU(k,:)+fcn_rate_calculate_with_BER(record_SINR_SRM_DU, SINR_Boundary);
-        ave_rate_HD_DU(k,:)=ave_rate_HD_DU(k,:)+fcn_rate_calculate_with_BER(record_SINR_HD_DU, SINR_Boundary);
-        ave_rate_MAC_DU(k,:)=ave_rate_MAC_DU(k,:)+fcn_rate_calculate_with_BER(record_SINR_MAC_DU, SINR_Boundary);
+        ave_rate_IA_DU(k,:)=ave_rate_IA_DU(k,:)+fcn_rate_calculate_with_PER(record_SINR_IA_DU, snrtable, packet_size, Target_PER);
+        ave_rate_IM_DU(k,:)=ave_rate_IM_DU(k,:)+fcn_rate_calculate_with_PER(record_SINR_IM_DU, snrtable, packet_size, Target_PER);
+        ave_rate_SM_DU(k,:)=ave_rate_SM_DU(k,:)+fcn_rate_calculate_with_PER(record_SINR_SM_DU, snrtable, packet_size, Target_PER);
+        ave_rate_SMM_DU(k,:)=ave_rate_SMM_DU(k,:)+fcn_rate_calculate_with_PER(record_SINR_SMM_DU, snrtable, packet_size, Target_PER);
+        ave_rate_SRM_DU(k,:)=ave_rate_SRM_DU(k,:)+fcn_rate_calculate_with_PER(record_SINR_SRM_DU, snrtable, packet_size, Target_PER);
+        ave_rate_HD_DU(k,:)=ave_rate_HD_DU(k,:)+fcn_rate_calculate_with_PER(record_SINR_HD_DU, snrtable, packet_size, Target_PER);
+        ave_rate_MAC_DU(k,:)=ave_rate_MAC_DU(k,:)+fcn_rate_calculate_with_PER(record_SINR_MAC_DU, snrtable, packet_size, Target_PER);
         
-        ave_rate_IA_UD(k,:)=ave_rate_IA_UD(k,:)+fcn_rate_calculate_with_BER(record_SINR_IA_UD, SINR_Boundary);
-        ave_rate_IM_UD(k,:)=ave_rate_IM_UD(k,:)+fcn_rate_calculate_with_BER(record_SINR_IM_UD, SINR_Boundary);
-        ave_rate_SM_UD(k,:)=ave_rate_SM_UD(k,:)+fcn_rate_calculate_with_BER(record_SINR_SM_UD, SINR_Boundary);
-        ave_rate_SMM_UD(k,:)=ave_rate_SMM_UD(k,:)+fcn_rate_calculate_with_BER(record_SINR_SMM_UD, SINR_Boundary);
-        ave_rate_SRM_UD(k,:)=ave_rate_SRM_UD(k,:)+fcn_rate_calculate_with_BER(record_SINR_SRM_UD, SINR_Boundary);
-        ave_rate_HD_UD(k,:)=ave_rate_HD_UD(k,:)+fcn_rate_calculate_with_BER(record_SINR_HD_UD, SINR_Boundary);
+        ave_rate_IA_UD(k,:)=ave_rate_IA_UD(k,:)+fcn_rate_calculate_with_PER(record_SINR_IA_UD, snrtable, packet_size, Target_PER);
+        ave_rate_IM_UD(k,:)=ave_rate_IM_UD(k,:)+fcn_rate_calculate_with_PER(record_SINR_IM_UD, snrtable, packet_size, Target_PER);
+        ave_rate_SM_UD(k,:)=ave_rate_SM_UD(k,:)+fcn_rate_calculate_with_PER(record_SINR_SM_UD, snrtable, packet_size, Target_PER);
+        ave_rate_SMM_UD(k,:)=ave_rate_SMM_UD(k,:)+fcn_rate_calculate_with_PER(record_SINR_SMM_UD, snrtable, packet_size, Target_PER);
+        ave_rate_SRM_UD(k,:)=ave_rate_SRM_UD(k,:)+fcn_rate_calculate_with_PER(record_SINR_SRM_UD, snrtable, packet_size, Target_PER);
+        ave_rate_HD_UD(k,:)=ave_rate_HD_UD(k,:)+fcn_rate_calculate_with_PER(record_SINR_HD_UD, snrtable, packet_size, Target_PER);
         
         % calculate rate based on SINR and sum up
         %ave_rate_IA_DU(k,:)=ave_rate_IA_DU(k,:)+fcn_rate_calculate(record_SINR_IA_DU);
