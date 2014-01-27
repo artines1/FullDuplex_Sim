@@ -33,10 +33,16 @@ for i=1:num_up_STA
     else
         estimate_SNR = (SNR_FirstStation * (1 - historical_ratio)) + (historical_ratio * History_SINR_Data(temp_second_idx, transmission_first));
         estimate_SNR = pow2db(estimate_SNR);
-        desire_SINR = db2pow(estimate_SNR - SINR_Diff_Limit);
+        desire_SINR = estimate_SNR - SINR_Diff_Limit;
+        power_desire_SINR = db2pow(desire_SINR);
         
-        StationB_Power(1,i) =  (1 / ((StationB_RecieveTone(1,i) / K) / db2pow(power_transmit_STA))) * (1 / desire_SINR);
-        StationB_Power(1,i) =  StationB_Power(1,i) - (db2pow(Noise_Power_db) / db2pow(channel_gain(transmission_first,traffic_reg_second(i,1))));
+        
+        StationB_Power(1,i) = (db2pow(power_transmit_STA) * K * db2pow(channel_gain(transmission_first,traffic_reg_second(i,1)))) / StationB_RecieveTone(1,i);
+        StationB_Power(1,i) = (StationB_Power(1,i) / power_desire_SINR) - db2pow(Noise_Power_db);
+        StationB_Power(1,i) = StationB_Power(1,i) / db2pow(channel_gain(transmission_first,traffic_reg_second(i,1)));                
+        
+        %StationB_Power(1,i) =  (db2pow(SINR_Diff_Limit) / estimate_SNR) - (1 / SNR_FirstStation); 
+        %StationB_Power(1,i) =  StationB_Power(1,i) * K * db2pow(power_transmit_STA) / StationB_RecieveTone(1,i);
     end
     
     
@@ -51,7 +57,7 @@ end
 %% Step4: Fairly pick a station 
 trans_station = unidrnd(num_up_STA,1);
 
-transmission_second=traffic_reg_second(1, trans_station);
-upLink_power=StationB_Power(1, trans_station);
+transmission_second=traffic_reg_second(trans_station, 1);
+upLink_power=pow2db(abs(StationB_Power(1, trans_station)));
 end
 
