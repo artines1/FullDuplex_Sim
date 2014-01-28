@@ -56,6 +56,15 @@ ave_rate_SRM_UD=zeros(K,3);
 ave_rate_HD_UD=zeros(K,3);
 ave_rate_MAC_UD=zeros(K,3);
 
+%{
+record_power_UpLink_1db_Perfect=[];
+record_power_UpLink_2db_Perfect=[];
+record_power_UpLink_3db_Perfect=[];
+record_power_UpLink_1db_History=[];
+record_power_UpLink_2db_History=[];
+record_power_UpLink_3db_History=[];
+%}
+
 % ave_SINR_IA_DU_AP=zeros(K,1);
 % ave_SINR_IM_DU_AP=zeros(K,1);
 % ave_SINR_SM_DU_AP=zeros(K,1);
@@ -383,7 +392,15 @@ for k=1:K % self-interference iteration
             [record_SINR_MAC_Power_Fair_2db_History_DU(:,t)]=fcn_SINR_calculate(record_traffic_MAC_Power_Fair_2db_History_DU(:,t),power_transmit_AP,Power_UpLink_2db_History(1,t),channel_gain_withAP_temp,channel_gain_temp,noise_power,self_interference_channel_gain_AP);            
             [record_SINR_MAC_Power_Fair_3db_History_DU(:,t)]=fcn_SINR_calculate(record_traffic_MAC_Power_Fair_3db_History_DU(:,t),power_transmit_AP,Power_UpLink_3db_History(1,t),channel_gain_withAP_temp,channel_gain_temp,noise_power,self_interference_channel_gain_AP);            
             
-            
+            % record power
+            %{
+            record_power_UpLink_1db_Perfect=cat(2, record_power_UpLink_1db_Perfect, Power_UpLink_1db_NoHistory);
+            record_power_UpLink_2db_Perfect=cat(2, record_power_UpLink_2db_Perfect, Power_UpLink_2db_NoHistory);
+            record_power_UpLink_3db_Perfect=cat(2, record_power_UpLink_3db_Perfect, Power_UpLink_3db_NoHistory);
+            record_power_UpLink_1db_History=cat(2, record_power_UpLink_1db_History, Power_UpLink_1db_History);
+            record_power_UpLink_2db_History=cat(2, record_power_UpLink_2db_History, Power_UpLink_2db_History);
+            record_power_UpLink_3db_History=cat(2, record_power_UpLink_3db_History, Power_UpLink_3db_History);
+            %}
             %% UP-DOWN
             traffic_reg_first(:,:)=0;
             traffic_reg_second(:,:)=0;
@@ -497,7 +514,8 @@ for k=1:K % self-interference iteration
         ave_rate_SM_UD(k,:)=ave_rate_SM_UD(k,:)+fcn_rate_calculate_with_PER(record_SINR_SM_UD, snrtable, packet_size, Target_PER);
         ave_rate_SMM_UD(k,:)=ave_rate_SMM_UD(k,:)+fcn_rate_calculate_with_PER(record_SINR_SMM_UD, snrtable, packet_size, Target_PER);
         ave_rate_SRM_UD(k,:)=ave_rate_SRM_UD(k,:)+fcn_rate_calculate_with_PER(record_SINR_SRM_UD, snrtable, packet_size, Target_PER);
-        ave_rate_HD_UD(k,:)=ave_rate_HD_UD(k,:)+fcn_rate_calculate_with_PER(record_SINR_HD_UD, snrtable, packet_size, Target_PER);
+        ave_rate_HD_UD(k,:)=ave_rate_HD_UD(k,:)+fcn_rate_calculate_with_PER(record_SINR_HD_UD, snrtable, packet_size, Target_PER);               
+        
         
         % calculate rate based on SINR and sum up
         %ave_rate_IA_DU(k,:)=ave_rate_IA_DU(k,:)+fcn_rate_calculate(record_SINR_IA_DU);
@@ -572,20 +590,45 @@ for k=1:K % self-interference iteration
 %         ave_traffic_HD_UD_U(k,1)=ave_traffic_HD_UD_U(k,1)+nnz(record_traffic_HD_UD(1,:))/total_time;
     end
     
-    
-%     ave_rate_IA_DU(k,:)=ave_rate_IA_DU(k,:)/Monte_Carlo_T;
-%     ave_rate_IM_DU(k,:)=ave_rate_IM_DU(k,:)/Monte_Carlo_T;
-%     ave_rate_SM_DU(k,:)=ave_rate_SM_DU(k,:)/Monte_Carlo_T;
-%     ave_rate_SMM_DU(k,:)=ave_rate_SMM_DU(k,:)/Monte_Carlo_T;
-%     ave_rate_SRM_DU(k,:)=ave_rate_SRM_DU(k,:)/Monte_Carlo_T;
-%     ave_rate_HD_DU(k,:)=ave_rate_HD_DU(k,:)/Monte_Carlo_T;
-%     
-%     ave_rate_IA_UD(k,:)=ave_rate_IA_UD(k,:)/Monte_Carlo_T;
-%     ave_rate_IM_UD(k,:)=ave_rate_IM_UD(k,:)/Monte_Carlo_T;
-%     ave_rate_SM_UD(k,:)=ave_rate_SM_UD(k,:)/Monte_Carlo_T;
-%     ave_rate_SMM_UD(k,:)=ave_rate_SMM_UD(k,:)/Monte_Carlo_T;
-%     ave_rate_SRM_UD(k,:)=ave_rate_SRM_UD(k,:)/Monte_Carlo_T;
-%     ave_rate_HD_UD(k,:)=ave_rate_HD_UD(k,:)/Monte_Carlo_T;
+    %Plot CDF for uplink power
+    %{
+    figure(k)
+    hold on
+    cdf_1db_perfect=cdfplot(record_power_UpLink_1db_Perfect);    
+    set(cdf_1db_perfect,'color','red');
+    %cdfplot(record_power_UpLink_2db_Perfect);
+    %color('green');
+    %cdfplot(record_power_UpLink_3db_Perfect);
+    %color('red');
+    cdf_1db_history=cdfplot(record_power_UpLink_1db_History);
+    set(cdf_1db_history,'color','red');
+    %cdfplot(record_power_UpLink_2db_History);
+    %color('magenta');
+    %cdfplot(record_power_UpLink_3db_History);
+    %color('yellow');
+    legend('1db perfect','1db history','Location','NorthEast');
+    hold off
+    %}
+     ave_rate_IA_DU(k,:)=ave_rate_IA_DU(k,:)/Monte_Carlo_T;
+     ave_rate_IM_DU(k,:)=ave_rate_IM_DU(k,:)/Monte_Carlo_T;
+     ave_rate_SM_DU(k,:)=ave_rate_SM_DU(k,:)/Monte_Carlo_T;
+     ave_rate_SMM_DU(k,:)=ave_rate_SMM_DU(k,:)/Monte_Carlo_T;
+     ave_rate_SRM_DU(k,:)=ave_rate_SRM_DU(k,:)/Monte_Carlo_T;
+     ave_rate_HD_DU(k,:)=ave_rate_HD_DU(k,:)/Monte_Carlo_T;
+     
+     ave_rate_MAC_Power_Fair_1db_NoHistory_DU(k,:)=ave_rate_MAC_Power_Fair_1db_NoHistory_DU(k,:)/Monte_Carlo_T;
+     ave_rate_MAC_Power_Fair_2db_NoHistory_DU(k,:)=ave_rate_MAC_Power_Fair_2db_NoHistory_DU(k,:)/Monte_Carlo_T;
+     ave_rate_MAC_Power_Fair_3db_NoHistory_DU(k,:)=ave_rate_MAC_Power_Fair_3db_NoHistory_DU(k,:)/Monte_Carlo_T;
+     ave_rate_MAC_Power_Fair_1db_History_DU(k,:)=ave_rate_MAC_Power_Fair_1db_History_DU(k,:)/Monte_Carlo_T;
+     ave_rate_MAC_Power_Fair_2db_History_DU(k,:)=ave_rate_MAC_Power_Fair_2db_History_DU(k,:)/Monte_Carlo_T;
+     ave_rate_MAC_Power_Fair_3db_History_DU(k,:)=ave_rate_MAC_Power_Fair_3db_History_DU(k,:)/Monte_Carlo_T;
+     
+     ave_rate_IA_UD(k,:)=ave_rate_IA_UD(k,:)/Monte_Carlo_T;
+     ave_rate_IM_UD(k,:)=ave_rate_IM_UD(k,:)/Monte_Carlo_T;
+     ave_rate_SM_UD(k,:)=ave_rate_SM_UD(k,:)/Monte_Carlo_T;
+     ave_rate_SMM_UD(k,:)=ave_rate_SMM_UD(k,:)/Monte_Carlo_T;
+     ave_rate_SRM_UD(k,:)=ave_rate_SRM_UD(k,:)/Monte_Carlo_T;
+     ave_rate_HD_UD(k,:)=ave_rate_HD_UD(k,:)/Monte_Carlo_T;
 %     
 %     ave_SINR_IA_DU_AP(k,1)=ave_SINR_IA_DU_AP(k,1)/Monte_Carlo_T;
 %     ave_SINR_IM_DU_AP(k,1)=ave_SINR_IM_DU_AP(k,1)/Monte_Carlo_T;

@@ -5,6 +5,8 @@ StationB_Power=zeros(1,num_up_STA);
 K=10; % System constant factor for broadcast tone
 global History_SINR_Data;
 historical_ratio = 0.2;
+Power_Constraint_db=5;
+Power_Constraint=db2pow(Power_Constraint_db);
 
 %% Step1: Ap transmit a packet to station A
 SignalAPtoA = db2pow(power_transmit_AP) * db2pow(channel_gain_withAP(2,transmission_first));
@@ -29,7 +31,7 @@ for i=1:num_up_STA
     SNR_FirstStation = 1 / SNR_FirstStation;
     
     if History_enable ~= 1
-        StationB_Power(1,i) = ((db2pow(SINR_Diff_Limit) - 1) * db2pow(Noise_Power_db)) / db2pow(channel_gain(transmission_first,traffic_reg_second(i,1)));
+        StationB_Power(1,i) = ((db2pow(SINR_Diff_Limit) - 1) * db2pow(Noise_Power_db)) / db2pow(channel_gain(transmission_first,traffic_reg_second(i,1)));              
     else
         estimate_SNR = (SNR_FirstStation * (1 - historical_ratio)) + (historical_ratio * History_SINR_Data(temp_second_idx, transmission_first));
         estimate_SNR = pow2db(estimate_SNR);
@@ -45,6 +47,10 @@ for i=1:num_up_STA
         %StationB_Power(1,i) =  StationB_Power(1,i) * K * db2pow(power_transmit_STA) / StationB_RecieveTone(1,i);
     end
     
+    if StationB_Power(1,i) > db2pow(power_transmit_STA)
+        StationB_Power(1,i) = db2pow(power_transmit_STA);
+    end
+    
     
     
     if time == 1
@@ -55,9 +61,21 @@ for i=1:num_up_STA
     end
 end
 %% Step4: Fairly pick a station 
-trans_station = unidrnd(num_up_STA,1);
+available_station_num = 0;
+available_station_list = [];
 
-transmission_second=traffic_reg_second(trans_station, 1);
-upLink_power=pow2db(abs(StationB_Power(1, trans_station)));
+while available_station_num <= 0
+    available_station_list = find(abs(StationB_Power(1,:)) >= Power_Constraint);
+    available_station_num = size(available_station_list, 2);
+    
+    Power_Constraint_db=Power_Constraint_db-1;
+    Power_Constraint=db2pow(Power_Constraint_db);
+end
+
+
+trans_station = unidrnd(available_station_num,1);
+
+transmission_second=traffic_reg_second(available_station_list(trans_station), 1);
+upLink_power=pow2db(abs(StationB_Power(1, available_station_list(trans_station))));
 end
 
