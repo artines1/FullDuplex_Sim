@@ -7,7 +7,6 @@ clc;
 %% parameters setting
 center_frequency=2.4*10^9;
 number_STAs=100;% the total number of STAs
-radius=250;% the radius of circle area (meter)
 power_transmit_AP=10;% the transmit power of AP (dBm)
 power_transmit_STA=10;% the transmit power of STA (dBm)
 d_avo_threshold=4;% the SINR threshold of Interference Avoidance (IA) (dB)
@@ -30,6 +29,14 @@ end
 self_interference_channel_gain_STA=-70:-5:-100;% the self-interference gain in STA (dB) 
 SNR_input=100;% input SNR (dB)
 noise_power=power_transmit_AP-SNR_input;% noise power level (-90dB)
+
+%% Distance constraint 
+SNR_Min_db = 5;
+SNR_Max_db = 30;
+Distance_Max = 10 ^ ((-(SNR_Min_db + noise_power - power_transmit_AP) + 147.55 - 20*log10(center_frequency)) / 20);
+Distance_Min = 10 ^ ((-(SNR_Max_db + noise_power - power_transmit_AP) + 147.55 - 20*log10(center_frequency)) / 20);
+
+radius=Distance_Max - Distance_Min;% the radius of circle area (meter)
 
 K=size(self_interference_channel_gain_STA,2); % self-interference iteration index 
 ave_rate_IA_DU=zeros(K,3); % column1:sum-rate column2:uplink-rate column3:downlink-rate
@@ -135,7 +142,8 @@ for k=1:K % self-interference iteration
         Power_UpLink_3db_History = zeros(1, total_time);
         %% random deploy STAs in a circle
         % uniform distribution in a circle
-        u=unifrnd(0,radius,[1,number_STAs])+unifrnd(0,radius,[1,number_STAs]);
+        %u=unifrnd(0,radius,[1,number_STAs])+unifrnd(0,radius,[1,number_STAs]);
+        u=Distance_Min+unifrnd(0,radius,[1,number_STAs]);
         r=zeros(1,number_STAs);
         for i=1:size(u,2)
             if u(1,i)>radius
@@ -185,8 +193,9 @@ for k=1:K % self-interference iteration
             channel_gain_withAP(1,:,t)=pathloss_gain_withAP;
             channel_gain_withAP(2,:,t)=pathloss_gain_withAP;
         end
-        channel_gain=channel_gain+fading_gain;% (dB)
-        channel_gain_withAP=channel_gain_withAP+fading_gain_withAP;% (dB)
+        % Remove Channel Model (temp)
+        %channel_gain=channel_gain+fading_gain;% (dB)
+        %channel_gain_withAP=channel_gain_withAP+fading_gain_withAP;% (dB)
         %% generate traffic
         traffic_up=zeros(number_STAs,total_time);
         traffic_down=zeros(number_STAs,total_time);

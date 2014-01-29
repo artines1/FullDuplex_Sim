@@ -2,9 +2,8 @@ function [ave_rate] = fcn_rate_calculate_with_PER(record_SINR, snrtable, packet_
 %FCN_RATE_CALCULATE_WITH_BER Summary of this function goes here
 %   Calculate Rate according to SINR and BER
 
-rate_byte_per_sec = [6 9 12 18 24 36 48 54].*1024/8;
+rate_byte_per_sec = [6 9 12 18 24 36 48 54].*(1024 ^ 2)/8;
 rate_time_cost = packet_size./rate_byte_per_sec;
-Packet_Error_Cost = 2; % packet error cost 2 second
 
 real_PER_up = 0;
 real_PER_down = 0;
@@ -59,13 +58,13 @@ for t=1:size(record_SINR,2)
         if ave_success_transmit(t,1) == 1
             ave_time_cost(t,1)=rate_time_cost(Rate_idx_up);
         else
-            ave_time_cost(t,1)=Packet_Error_Cost;
+            ave_time_cost(t,1)=rate_time_cost(Rate_idx_up) + (2 * 10 ^ -6); % add ack timeout
         end
         
         if ave_success_transmit(t,2) == 1
             ave_time_cost(t,2)=rate_time_cost(Rate_idx_down);
         else
-            ave_time_cost(t,2)=Packet_Error_Cost;
+            ave_time_cost(t,2)=rate_time_cost(Rate_idx_down) + (2 * 10 ^ -6);
         end
         
     elseif record_SINR(1,t)==0&&record_SINR(2,t)~=0 % only downlink
@@ -73,14 +72,14 @@ for t=1:size(record_SINR,2)
         if ave_success_transmit(t,2) == 1
             ave_time_cost(t,2)=rate_time_cost(Rate_idx_down);
         else
-            ave_time_cost(t,2)=Packet_Error_Cost;
+            ave_time_cost(t,2)=rate_time_cost(Rate_idx_down) + (2 * 10 ^ -6);
         end
     elseif record_SINR(1,t)~=0&&record_SINR(2,t)==0% only uplink
         ave_success_transmit(t,1)=randsrc(1,1,[1 0; 1-real_PER_up real_PER_up]);
         if ave_success_transmit(t,1) == 1
             ave_time_cost(t,1)=rate_time_cost(Rate_idx_up);
         else
-            ave_time_cost(t,2)=Packet_Error_Cost;
+            ave_time_cost(t,2)=rate_time_cost(Rate_idx_down) + (2 * 10 ^ -6);
         end
     end
     
