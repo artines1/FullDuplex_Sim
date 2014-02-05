@@ -2,7 +2,7 @@ function [ave_rate] = fcn_rate_calculate_with_PER(record_SINR, snrtable, packet_
 %FCN_RATE_CALCULATE_WITH_BER Summary of this function goes here
 %   Calculate Rate according to SINR and BER
 
-rate_byte_per_sec = [6 9 12 18 24 36 48 54].*(1024 ^ 2)/8;
+rate_byte_per_sec = [3 4.5 6 9 12 18 24 27].*(1024 ^ 2)/8;
 rate_time_cost = packet_size./rate_byte_per_sec;
 
 real_PER_up = 0;
