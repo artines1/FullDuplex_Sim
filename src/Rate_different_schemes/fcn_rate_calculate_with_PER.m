@@ -87,13 +87,13 @@ end
 if sum(packet_size.*ave_success_transmit(:,1)) == 0
     ave_rate(1,2) = 0;
 else
-    ave_rate(1,2)=sum(packet_size.*ave_success_transmit(:,1)) / sum(ave_time_cost(:,1));
+    ave_rate(1,2)=sum(packet_size.*ave_success_transmit(:,1)) / sum(ave_time_cost(:,1)) / 1024 * 8;
 end
 
 if sum(packet_size.*ave_success_transmit(:,2)) == 0
     ave_rate(1,3) = 0;
 else
-    ave_rate(1,3)=sum(packet_size.*ave_success_transmit(:,2)) / sum(ave_time_cost(:,2));
+    ave_rate(1,3)=sum(packet_size.*ave_success_transmit(:,2)) / sum(ave_time_cost(:,2)) / 1024 * 8;
 end
 
 ave_rate(1,1)=ave_rate(1,2) + ave_rate(1,3);
