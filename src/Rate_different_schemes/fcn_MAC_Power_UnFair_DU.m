@@ -1,10 +1,9 @@
-function [transmission_second, upLink_power ]=fcn_MAC_Power_UnFair_DU(transmission_first,traffic_reg_second,num_up_STA,channel_gain,channel_gain_withAP,power_transmit_AP,power_transmit_STA, time, History_enable, SINR_Diff_Limit, Noise_Power_db)
+function [transmission_second, upLink_power ]=fcn_MAC_Power_UnFair_DU(transmission_first,traffic_reg_second,num_up_STA,channel_gain,channel_gain_withAP,power_transmit_AP,power_transmit_STA, History_SINR_Data, History_enable, SINR_Diff_Limit, Noise_Power_db)
 %MAC: Decide second transmission station by out MAC design
 StationB_RecieveTone=zeros(1,num_up_STA);
 StationB_Power=zeros(1,num_up_STA);
 SINR_After_PowerContorl=zeros(1,num_up_STA);
 K=10; % System constant factor for broadcast tone
-global History_SINR_Data;
 historical_ratio = 0.2;
 
 %% Step1: Ap transmit a packet to station A
@@ -32,7 +31,13 @@ for i=1:num_up_STA
     if History_enable ~= 1
         StationB_Power(1,i) = ((db2pow(SINR_Diff_Limit) - 1) * db2pow(Noise_Power_db)) / db2pow(channel_gain(transmission_first,traffic_reg_second(i,1)));              
     else
-        estimate_SNR = (SNR_FirstStation * (1 - historical_ratio)) + (historical_ratio * History_SINR_Data(temp_second_idx, transmission_first));
+        temp_history_SINR = History_SINR_Data(temp_second_idx, transmission_first);
+        
+        if temp_history_SINR == 0
+            temp_history_SINR = SNR_FirstStation;
+        end
+        
+        estimate_SNR = (SNR_FirstStation * (1 - historical_ratio)) + (historical_ratio * temp_history_SINR);
         estimate_SNR = pow2db(estimate_SNR);
         desire_SINR = estimate_SNR - SINR_Diff_Limit;
         power_desire_SINR = db2pow(desire_SINR);
@@ -50,14 +55,6 @@ for i=1:num_up_STA
         StationB_Power(1,i) = db2pow(power_transmit_STA);
     end
     
-    
-    
-    if time == 1
-        History_SINR_Data(temp_second_idx, transmission_first) = SNR_FirstStation;
-    else        
-        % update historical data
-        History_SINR_Data(temp_second_idx, transmission_first) = ((History_SINR_Data(temp_second_idx, transmission_first) * (time - 1)) + SNR_FirstStation) / time;
-    end
 end
 %% Step4: pick a station with the highest SNR for AP 
 for i=1:num_up_STA
