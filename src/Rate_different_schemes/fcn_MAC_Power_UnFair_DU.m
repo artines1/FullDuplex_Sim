@@ -58,7 +58,7 @@ for i=1:num_up_STA
 end
 %% Step4: pick a station with the highest SNR for AP 
 for i=1:num_up_STA
-    SINR_After_PowerContorl(1,i) = pow2db(StationB_Power(1, i)) + channel_gain_withAP(2,traffic_reg_second(i,1)); % omit noise part, because it is all the same for all stations
+    SINR_After_PowerContorl(1,i) = pow2db(abs(StationB_Power(1, i))) + channel_gain_withAP(2,traffic_reg_second(i,1)); % omit noise part, because it is all the same for all stations
 end
 
 [~,Max_index]=max(SINR_After_PowerContorl);

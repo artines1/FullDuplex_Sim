@@ -56,6 +56,9 @@ ave_rate_MAC_Power_Fair_3db_History_DU=zeros(K,3);
 ave_rate_MAC_Power_UnFair_1db_NoHistory_DU=zeros(K,3);
 ave_rate_MAC_Power_UnFair_2db_NoHistory_DU=zeros(K,3);
 ave_rate_MAC_Power_UnFair_3db_NoHistory_DU=zeros(K,3);
+ave_rate_MAC_Power_UnFair_1db_History_DU=zeros(K,3);
+ave_rate_MAC_Power_UnFair_2db_History_DU=zeros(K,3);
+ave_rate_MAC_Power_UnFair_3db_History_DU=zeros(K,3);
 
 
 ave_rate_IA_UD=zeros(K,3); % column1:sum-rate column2:uplink-rate- column3:downlink-rate
@@ -149,6 +152,10 @@ for k=1:K % self-interference iteration
         Power_UpLink_1db_NoHistory_UnFair = zeros(1, total_time);
         Power_UpLink_2db_NoHistory_UnFair = zeros(1, total_time);
         Power_UpLink_3db_NoHistory_UnFair = zeros(1, total_time);
+        
+        Power_UpLink_1db_History_UnFair = zeros(1, total_time);
+        Power_UpLink_2db_History_UnFair = zeros(1, total_time);
+        Power_UpLink_3db_History_UnFair = zeros(1, total_time);
         %% random deploy STAs in a circle
         % uniform distribution in a circle
         %u=unifrnd(0,radius,[1,number_STAs])+unifrnd(0,radius,[1,number_STAs]);
@@ -201,10 +208,9 @@ for k=1:K % self-interference iteration
             channel_gain(:,:,t)= pathloss_gain;
             channel_gain_withAP(1,:,t)=pathloss_gain_withAP;
             channel_gain_withAP(2,:,t)=pathloss_gain_withAP;
-        end
-        % Remove Channel Model (temp)
-        %channel_gain=channel_gain+fading_gain;% (dB)
-        %channel_gain_withAP=channel_gain_withAP+fading_gain_withAP;% (dB)
+        end        
+        channel_gain=channel_gain+fading_gain;% (dB)
+        channel_gain_withAP=channel_gain_withAP+fading_gain_withAP;% (dB)
         %% generate traffic
         traffic_up=zeros(number_STAs,total_time);
         traffic_down=zeros(number_STAs,total_time);
@@ -239,6 +245,9 @@ for k=1:K % self-interference iteration
         record_traffic_MAC_Power_UnFair_1db_NoHistory_DU=zeros(2, total_time);
         record_traffic_MAC_Power_UnFair_2db_NoHistory_DU=zeros(2, total_time);
         record_traffic_MAC_Power_UnFair_3db_NoHistory_DU=zeros(2, total_time);
+        record_traffic_MAC_Power_UnFair_1db_History_DU=zeros(2, total_time);
+        record_traffic_MAC_Power_UnFair_2db_History_DU=zeros(2, total_time);
+        record_traffic_MAC_Power_UnFair_3db_History_DU=zeros(2, total_time);
         
         record_SINR_IA_DU=zeros(4,total_time);%record the corresponding SINR of up/down in each time-slot row1:AP(up) row2:STA(down) row3: estimate AP(up) row4: estimate STA(down)
         record_SINR_IM_DU=zeros(4,total_time);
@@ -258,6 +267,9 @@ for k=1:K % self-interference iteration
         record_SINR_MAC_Power_UnFair_1db_NoHistory_DU=zeros(4,total_time);
         record_SINR_MAC_Power_UnFair_2db_NoHistory_DU=zeros(4,total_time);
         record_SINR_MAC_Power_UnFair_3db_NoHistory_DU=zeros(4,total_time);
+        record_SINR_MAC_Power_UnFair_1db_History_DU=zeros(4,total_time);
+        record_SINR_MAC_Power_UnFair_2db_History_DU=zeros(4,total_time);
+        record_SINR_MAC_Power_UnFair_3db_History_DU=zeros(4,total_time);
         
         record_traffic_IA_UD=zeros(2,total_time);
         record_traffic_IM_UD=zeros(2,total_time);
@@ -327,7 +339,11 @@ for k=1:K % self-interference iteration
                     [record_traffic_MAC_Power_UnFair_1db_NoHistory_DU(1,t), Power_UpLink_1db_NoHistory_UnFair(1,t)]=fcn_MAC_Power_UnFair_DU(transmission_first,traffic_reg_second,num_up_STA,channel_gain_temp,channel_gain_withAP_temp,power_transmit_AP,power_transmit_STA,History_SINR_Data,0,1,noise_power);
                     [record_traffic_MAC_Power_UnFair_2db_NoHistory_DU(1,t), Power_UpLink_2db_NoHistory_UnFair(1,t)]=fcn_MAC_Power_UnFair_DU(transmission_first,traffic_reg_second,num_up_STA,channel_gain_temp,channel_gain_withAP_temp,power_transmit_AP,power_transmit_STA,History_SINR_Data,0,2,noise_power);
                     [record_traffic_MAC_Power_UnFair_3db_NoHistory_DU(1,t), Power_UpLink_3db_NoHistory_UnFair(1,t)]=fcn_MAC_Power_UnFair_DU(transmission_first,traffic_reg_second,num_up_STA,channel_gain_temp,channel_gain_withAP_temp,power_transmit_AP,power_transmit_STA,History_SINR_Data,0,3,noise_power);
+                    [record_traffic_MAC_Power_UnFair_1db_History_DU(1,t), Power_UpLink_1db_History_UnFair(1,t)]=fcn_MAC_Power_UnFair_DU(transmission_first,traffic_reg_second,num_up_STA,channel_gain_temp,channel_gain_withAP_temp,power_transmit_AP,power_transmit_STA,History_SINR_Data,1,1,noise_power);
+                    [record_traffic_MAC_Power_UnFair_2db_History_DU(1,t), Power_UpLink_2db_History_UnFair(1,t)]=fcn_MAC_Power_UnFair_DU(transmission_first,traffic_reg_second,num_up_STA,channel_gain_temp,channel_gain_withAP_temp,power_transmit_AP,power_transmit_STA,History_SINR_Data,2,2,noise_power);
+                    [record_traffic_MAC_Power_UnFair_3db_History_DU(1,t), Power_UpLink_3db_History_UnFair(1,t)]=fcn_MAC_Power_UnFair_DU(transmission_first,traffic_reg_second,num_up_STA,channel_gain_temp,channel_gain_withAP_temp,power_transmit_AP,power_transmit_STA,History_SINR_Data,3,3,noise_power);
                
+                    
                     %Update history data for MAC
                     [History_SINR_Data, History_count]=fcn_MAC_Update_Histroy(History_SINR_Data, History_count, transmission_first, number_STAs, channel_gain_temp, channel_gain_withAP_temp, power_transmit_AP, power_transmit_STA, noise_power);
                 else
@@ -348,6 +364,9 @@ for k=1:K % self-interference iteration
                     record_traffic_MAC_Power_UnFair_1db_NoHistory_DU(1,t)=0;
                     record_traffic_MAC_Power_UnFair_2db_NoHistory_DU(1,t)=0;
                     record_traffic_MAC_Power_UnFair_3db_NoHistory_DU(1,t)=0;
+                    record_traffic_MAC_Power_UnFair_1db_History_DU(1,t)=0;
+                    record_traffic_MAC_Power_UnFair_2db_History_DU(1,t)=0;
+                    record_traffic_MAC_Power_UnFair_3db_History_DU(1,t)=0;
                     
                     
                     Power_UpLink_1db_NoHistory(1,t)=power_transmit_STA;
@@ -360,6 +379,9 @@ for k=1:K % self-interference iteration
                     Power_UpLink_1db_NoHistory_UnFair(1,t)=power_transmit_STA;
                     Power_UpLink_2db_NoHistory_UnFair(1,t)=power_transmit_STA;
                     Power_UpLink_3db_NoHistory_UnFair(1,t)=power_transmit_STA;
+                    Power_UpLink_1db_History_UnFair(1,t)=power_transmit_STA;
+                    Power_UpLink_2db_History_UnFair(1,t)=power_transmit_STA;
+                    Power_UpLink_3db_History_UnFair(1,t)=power_transmit_STA;
                 end
                 % --------------------------------------------------------%
             else % There's no downlink traffic
@@ -381,6 +403,9 @@ for k=1:K % self-interference iteration
                 Power_UpLink_1db_NoHistory_UnFair(1,t)=power_transmit_STA;
                 Power_UpLink_2db_NoHistory_UnFair(1,t)=power_transmit_STA;
                 Power_UpLink_3db_NoHistory_UnFair(1,t)=power_transmit_STA;
+                Power_UpLink_1db_History_UnFair(1,t)=power_transmit_STA;
+                Power_UpLink_2db_History_UnFair(1,t)=power_transmit_STA;
+                Power_UpLink_3db_History_UnFair(1,t)=power_transmit_STA;
                 
                 %choose uplink STAs randomly
                 if num_up_STA~=0
@@ -402,6 +427,9 @@ for k=1:K % self-interference iteration
                     record_traffic_MAC_Power_UnFair_1db_NoHistory_DU(1,t)=traffic_reg_second(unidrnd(num_up_STA,1));
                     record_traffic_MAC_Power_UnFair_2db_NoHistory_DU(1,t)=traffic_reg_second(unidrnd(num_up_STA,1));
                     record_traffic_MAC_Power_UnFair_3db_NoHistory_DU(1,t)=traffic_reg_second(unidrnd(num_up_STA,1));
+                    record_traffic_MAC_Power_UnFair_1db_History_DU(1,t)=traffic_reg_second(unidrnd(num_up_STA,1));
+                    record_traffic_MAC_Power_UnFair_2db_History_DU(1,t)=traffic_reg_second(unidrnd(num_up_STA,1));
+                    record_traffic_MAC_Power_UnFair_3db_History_DU(1,t)=traffic_reg_second(unidrnd(num_up_STA,1));
                 else
                     record_traffic_IA_DU(1,t)=0;
                     record_traffic_IM_DU(1,t)=0;
@@ -420,6 +448,9 @@ for k=1:K % self-interference iteration
                     record_traffic_MAC_Power_UnFair_1db_NoHistory_DU(1,t)=0;
                     record_traffic_MAC_Power_UnFair_2db_NoHistory_DU(1,t)=0;
                     record_traffic_MAC_Power_UnFair_3db_NoHistory_DU(1,t)=0;
+                    record_traffic_MAC_Power_UnFair_1db_History_DU(1,t)=0;
+                    record_traffic_MAC_Power_UnFair_2db_History_DU(1,t)=0;
+                    record_traffic_MAC_Power_UnFair_3db_History_DU(1,t)=0;
                 end
               
             end
@@ -442,6 +473,9 @@ for k=1:K % self-interference iteration
             record_traffic_MAC_Power_UnFair_1db_NoHistory_DU(2,t)=transmission_first;
             record_traffic_MAC_Power_UnFair_2db_NoHistory_DU(2,t)=transmission_first;
             record_traffic_MAC_Power_UnFair_3db_NoHistory_DU(2,t)=transmission_first;
+            record_traffic_MAC_Power_UnFair_1db_History_DU(2,t)=transmission_first;
+            record_traffic_MAC_Power_UnFair_2db_History_DU(2,t)=transmission_first;
+            record_traffic_MAC_Power_UnFair_3db_History_DU(2,t)=transmission_first;
             
             % calculate SINR based on record traffic 
             [record_SINR_IA_DU(:,t)]=fcn_SINR_calculate(record_traffic_IA_DU(:,t),power_transmit_AP,power_transmit_STA,channel_gain_withAP_temp,channel_gain_temp,noise_power,self_interference_channel_gain_AP);
@@ -462,6 +496,9 @@ for k=1:K % self-interference iteration
             [record_SINR_MAC_Power_UnFair_1db_NoHistory_DU(:,t)]=fcn_SINR_calculate(record_traffic_MAC_Power_UnFair_1db_NoHistory_DU(:,t),power_transmit_AP,Power_UpLink_1db_NoHistory_UnFair(1,t),channel_gain_withAP_temp,channel_gain_temp,noise_power,self_interference_channel_gain_AP);            
             [record_SINR_MAC_Power_UnFair_2db_NoHistory_DU(:,t)]=fcn_SINR_calculate(record_traffic_MAC_Power_UnFair_2db_NoHistory_DU(:,t),power_transmit_AP,Power_UpLink_2db_NoHistory_UnFair(1,t),channel_gain_withAP_temp,channel_gain_temp,noise_power,self_interference_channel_gain_AP);            
             [record_SINR_MAC_Power_UnFair_3db_NoHistory_DU(:,t)]=fcn_SINR_calculate(record_traffic_MAC_Power_UnFair_3db_NoHistory_DU(:,t),power_transmit_AP,Power_UpLink_3db_NoHistory_UnFair(1,t),channel_gain_withAP_temp,channel_gain_temp,noise_power,self_interference_channel_gain_AP);            
+            [record_SINR_MAC_Power_UnFair_1db_History_DU(:,t)]=fcn_SINR_calculate(record_traffic_MAC_Power_UnFair_1db_History_DU(:,t),power_transmit_AP,Power_UpLink_1db_History_UnFair(1,t),channel_gain_withAP_temp,channel_gain_temp,noise_power,self_interference_channel_gain_AP);            
+            [record_SINR_MAC_Power_UnFair_2db_History_DU(:,t)]=fcn_SINR_calculate(record_traffic_MAC_Power_UnFair_2db_History_DU(:,t),power_transmit_AP,Power_UpLink_2db_History_UnFair(1,t),channel_gain_withAP_temp,channel_gain_temp,noise_power,self_interference_channel_gain_AP);            
+            [record_SINR_MAC_Power_UnFair_3db_History_DU(:,t)]=fcn_SINR_calculate(record_traffic_MAC_Power_UnFair_3db_History_DU(:,t),power_transmit_AP,Power_UpLink_3db_History_UnFair(1,t),channel_gain_withAP_temp,channel_gain_temp,noise_power,self_interference_channel_gain_AP);            
             
             % record power
             %{
@@ -582,6 +619,9 @@ for k=1:K % self-interference iteration
         ave_rate_MAC_Power_UnFair_1db_NoHistory_DU(k,:)=ave_rate_MAC_Power_UnFair_1db_NoHistory_DU(k,:)+fcn_rate_calculate_with_PER(record_SINR_MAC_Power_UnFair_1db_NoHistory_DU, snrtable, packet_size, Target_PER);
         ave_rate_MAC_Power_UnFair_2db_NoHistory_DU(k,:)=ave_rate_MAC_Power_UnFair_2db_NoHistory_DU(k,:)+fcn_rate_calculate_with_PER(record_SINR_MAC_Power_UnFair_2db_NoHistory_DU, snrtable, packet_size, Target_PER);
         ave_rate_MAC_Power_UnFair_3db_NoHistory_DU(k,:)=ave_rate_MAC_Power_UnFair_3db_NoHistory_DU(k,:)+fcn_rate_calculate_with_PER(record_SINR_MAC_Power_UnFair_3db_NoHistory_DU, snrtable, packet_size, Target_PER);
+        ave_rate_MAC_Power_UnFair_1db_History_DU(k,:)=ave_rate_MAC_Power_UnFair_1db_History_DU(k,:)+fcn_rate_calculate_with_PER(record_SINR_MAC_Power_UnFair_1db_History_DU, snrtable, packet_size, Target_PER);
+        ave_rate_MAC_Power_UnFair_2db_History_DU(k,:)=ave_rate_MAC_Power_UnFair_2db_History_DU(k,:)+fcn_rate_calculate_with_PER(record_SINR_MAC_Power_UnFair_2db_History_DU, snrtable, packet_size, Target_PER);
+        ave_rate_MAC_Power_UnFair_3db_History_DU(k,:)=ave_rate_MAC_Power_UnFair_3db_History_DU(k,:)+fcn_rate_calculate_with_PER(record_SINR_MAC_Power_UnFair_3db_History_DU, snrtable, packet_size, Target_PER);
                        
         ave_rate_IA_UD(k,:)=ave_rate_IA_UD(k,:)+fcn_rate_calculate_with_PER(record_SINR_IA_UD, snrtable, packet_size, Target_PER);
         ave_rate_IM_UD(k,:)=ave_rate_IM_UD(k,:)+fcn_rate_calculate_with_PER(record_SINR_IM_UD, snrtable, packet_size, Target_PER);
@@ -700,6 +740,9 @@ for k=1:K % self-interference iteration
      ave_rate_MAC_Power_UnFair_1db_NoHistory_DU(k,:)=ave_rate_MAC_Power_UnFair_1db_NoHistory_DU(k,:)/Monte_Carlo_T;
      ave_rate_MAC_Power_UnFair_2db_NoHistory_DU(k,:)=ave_rate_MAC_Power_UnFair_2db_NoHistory_DU(k,:)/Monte_Carlo_T;
      ave_rate_MAC_Power_UnFair_3db_NoHistory_DU(k,:)=ave_rate_MAC_Power_UnFair_3db_NoHistory_DU(k,:)/Monte_Carlo_T;
+     ave_rate_MAC_Power_UnFair_1db_History_DU(k,:)=ave_rate_MAC_Power_UnFair_1db_History_DU(k,:)/Monte_Carlo_T;
+     ave_rate_MAC_Power_UnFair_2db_History_DU(k,:)=ave_rate_MAC_Power_UnFair_2db_History_DU(k,:)/Monte_Carlo_T;
+     ave_rate_MAC_Power_UnFair_3db_History_DU(k,:)=ave_rate_MAC_Power_UnFair_3db_History_DU(k,:)/Monte_Carlo_T;
      
      ave_rate_IA_UD(k,:)=ave_rate_IA_UD(k,:)/Monte_Carlo_T;
      ave_rate_IM_UD(k,:)=ave_rate_IM_UD(k,:)/Monte_Carlo_T;
@@ -770,7 +813,7 @@ ave_rate_DU_with_channelgain=[ave_rate_IA_DU ave_rate_IM_DU ave_rate_SM_DU ave_r
 ave_rate_UD_with_channelgain=[ave_rate_IA_UD ave_rate_IM_UD ave_rate_SM_UD ave_rate_SMM_UD ave_rate_SRM_UD ave_rate_HD_UD];
 
 ave_rate_DU_MAC_Power_Fair=[ave_rate_MAC_Power_Fair_1db_NoHistory_DU ave_rate_MAC_Power_Fair_2db_NoHistory_DU ave_rate_MAC_Power_Fair_3db_NoHistory_DU ave_rate_MAC_Power_Fair_1db_History_DU ave_rate_MAC_Power_Fair_2db_History_DU ave_rate_MAC_Power_Fair_3db_History_DU];
-ave_rate_DU_MAC_Power_UnFair=[ave_rate_MAC_Power_UnFair_1db_NoHistory_DU ave_rate_MAC_Power_UnFair_2db_NoHistory_DU ave_rate_MAC_Power_UnFair_3db_NoHistory_DU];
+ave_rate_DU_MAC_Power_UnFair=[ave_rate_MAC_Power_UnFair_1db_NoHistory_DU ave_rate_MAC_Power_UnFair_2db_NoHistory_DU ave_rate_MAC_Power_UnFair_3db_NoHistory_DU ave_rate_MAC_Power_UnFair_1db_History_DU ave_rate_MAC_Power_UnFair_2db_History_DU ave_rate_MAC_Power_UnFair_3db_History_DU];
 
 % ave_SINR_DU_AP_with_channelgain=[ave_SINR_IA_DU_AP ave_SINR_IM_DU_AP ave_SINR_SM_DU_AP ave_SINR_SMM_DU_AP ave_SINR_SRM_DU_AP ave_SINR_HD_DU_AP];
 % ave_SINR_DU_STA_with_channelgain=[ave_SINR_IA_DU_STA ave_SINR_IM_DU_STA ave_SINR_SM_DU_STA ave_SINR_SMM_DU_STA ave_SINR_SRM_DU_STA ave_SINR_HD_DU_STA];
