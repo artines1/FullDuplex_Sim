@@ -60,7 +60,14 @@ for i=1:num_up_STA
 end
 %% Step4: Contention 
 % A. Initiate Contention Window
-CW_Size=CW_Size+31; % initiate CW size is 31
+for i=1:num_up_STA
+    SINR_After_PowerContorl = pow2db(abs(StationB_Power(1, i))) + channel_gain_withAP(2,traffic_reg_second(i,1)) - Noise_Power_db;
+    if(SINR_After_PowerContorl >= 10)
+        CW_Size(1,i)=31;
+    else
+        CW_Size(1,i)=1023;
+    end
+end
 
 % B. Contention
 pick_station=0;
