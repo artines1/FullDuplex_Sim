@@ -8,7 +8,7 @@ clc;
 load('snrtable.mat');
 %% Experiment profile setting
 Profiles(1, 1).available=true;
-Profiles(1, 1).profile_num=1;
+Profiles(1, 1).profile_num=7;
 Profiles(1, 1).center_frequency=2.4*10^9;
 Profiles(1, 1).number_STAs=100; % the total number of STAs
 Profiles(1, 1).power_transmit_AP=10;% the transmit power of AP (dBm)
@@ -17,13 +17,32 @@ Profiles(1, 1).d_avo_threshold=4;% the SINR threshold of Interference Avoidance 
 Profiles(1, 1).total_time=100;% total numbers of iterations in one Monte_Carlo trial
 Profiles(1, 1).pro_up=0.8; % uplink traffic probability
 Profiles(1, 1).pro_down=0.8;% downlink traffic probability
-Profiles(1, 1).Monte_Carlo_T=1000;% total numbers of Monte_Carlo trials
+Profiles(1, 1).Monte_Carlo_T=1;% total numbers of Monte_Carlo trials
 Profiles(1, 1).Target_PER = 0.1;
 Profiles(1, 1).packet_size = 1000; %1000 bytes
 Profiles(1, 1).self_interference_channel_gain_STA=-70;
 Profiles(1, 1).SNR_input=100;% input SNR (dB)
 Profiles(1, 1).SNR_Min_db = 5;
 Profiles(1, 1).SNR_Max_db = 30;
+Profiles(1, 1).log_path='./';
+
+Profiles(1 ,2)=Profiles(1, 1);
+Profiles(1 ,2).self_interference_channel_gain_STA=-75;
+
+Profiles(1 ,3)=Profiles(1, 1);
+Profiles(1 ,3).self_interference_channel_gain_STA=-80;
+
+Profiles(1 ,4)=Profiles(1, 1);
+Profiles(1 ,4).self_interference_channel_gain_STA=-85;
+
+Profiles(1 ,5)=Profiles(1, 1);
+Profiles(1 ,5).self_interference_channel_gain_STA=-90;
+
+Profiles(1 ,6)=Profiles(1, 1);
+Profiles(1 ,6).self_interference_channel_gain_STA=-95;
+
+Profiles(1 ,7)=Profiles(1, 1);
+Profiles(1 ,7).self_interference_channel_gain_STA=-100;
 
 experiment_num = size(Profiles,1);
 
@@ -61,6 +80,8 @@ for exper_idx=1:experiment_num
     ave_rate_SRM_UD=zeros(profile_num ,3);
     ave_rate_HD_UD=zeros(profile_num ,3);
     ave_rate_MAC_UD=zeros(profile_num ,3);
+    
+    result_file_path=strcat(Profiles(exper_idx, 1).log_path, 'SimulationResult');
     
     for prof_idx=1:profile_num
     
@@ -154,7 +175,7 @@ for exper_idx=1:experiment_num
             % free space path loss (dB)
             pathloss_gain=-(20*log10(distance)+20*log10(center_frequency)-147.55);
             for i=1:number_STAs
-                pathloss_gain(i,i)=self_interference_channel_gain_STA(1,k);
+                pathloss_gain(i,i)=self_interference_channel_gain_STA;
             end
             pathloss_gain_withAP=-(20*log10(distance_withAP)+20*log10(center_frequency)-147.55);
             %% Rayleigh fading
@@ -564,235 +585,107 @@ for exper_idx=1:experiment_num
 
             end             
         
-        % calculate rate based on SINR and sum up with BER
-        ave_rate_IA_DU(k,:)=ave_rate_IA_DU(k,:)+fcn_rate_calculate_with_PER(record_SINR_IA_DU, snrtable, packet_size, Target_PER);
-        ave_rate_IM_DU(k,:)=ave_rate_IM_DU(k,:)+fcn_rate_calculate_with_PER(record_SINR_IM_DU, snrtable, packet_size, Target_PER);
-        ave_rate_SM_DU(k,:)=ave_rate_SM_DU(k,:)+fcn_rate_calculate_with_PER(record_SINR_SM_DU, snrtable, packet_size, Target_PER);
-        ave_rate_SMM_DU(k,:)=ave_rate_SMM_DU(k,:)+fcn_rate_calculate_with_PER(record_SINR_SMM_DU, snrtable, packet_size, Target_PER);
-        ave_rate_SRM_DU(k,:)=ave_rate_SRM_DU(k,:)+fcn_rate_calculate_with_PER(record_SINR_SRM_DU, snrtable, packet_size, Target_PER);
-        ave_rate_HD_DU(k,:)=ave_rate_HD_DU(k,:)+fcn_rate_calculate_with_PER(record_SINR_HD_DU, snrtable, packet_size, Target_PER);
-        ave_rate_MAC_DU(k,:)=ave_rate_MAC_DU(k,:)+fcn_rate_calculate_with_PER(record_SINR_MAC_DU, snrtable, packet_size, Target_PER);
+            % calculate rate based on SINR and sum up with BER
+            ave_rate_IA_DU(prof_idx,:)=ave_rate_IA_DU(prof_idx,:)+fcn_rate_calculate_with_PER(record_SINR_IA_DU, snrtable, packet_size, Target_PER);
+            ave_rate_IM_DU(prof_idx,:)=ave_rate_IM_DU(prof_idx,:)+fcn_rate_calculate_with_PER(record_SINR_IM_DU, snrtable, packet_size, Target_PER);
+            ave_rate_SM_DU(prof_idx,:)=ave_rate_SM_DU(prof_idx,:)+fcn_rate_calculate_with_PER(record_SINR_SM_DU, snrtable, packet_size, Target_PER);
+            ave_rate_SMM_DU(prof_idx,:)=ave_rate_SMM_DU(prof_idx,:)+fcn_rate_calculate_with_PER(record_SINR_SMM_DU, snrtable, packet_size, Target_PER);
+            ave_rate_SRM_DU(prof_idx,:)=ave_rate_SRM_DU(prof_idx,:)+fcn_rate_calculate_with_PER(record_SINR_SRM_DU, snrtable, packet_size, Target_PER);
+            ave_rate_HD_DU(prof_idx,:)=ave_rate_HD_DU(prof_idx,:)+fcn_rate_calculate_with_PER(record_SINR_HD_DU, snrtable, packet_size, Target_PER);
+            ave_rate_MAC_DU(prof_idx,:)=ave_rate_MAC_DU(prof_idx,:)+fcn_rate_calculate_with_PER(record_SINR_MAC_DU, snrtable, packet_size, Target_PER);
+
+            ave_rate_MAC_Power_Fair_1db_NoHistory_DU(prof_idx,:)=ave_rate_MAC_Power_Fair_1db_NoHistory_DU(prof_idx,:)+fcn_rate_calculate_with_PER(record_SINR_MAC_Power_Fair_1db_NoHistory_DU, snrtable, packet_size, Target_PER);
+            ave_rate_MAC_Power_Fair_2db_NoHistory_DU(prof_idx,:)=ave_rate_MAC_Power_Fair_2db_NoHistory_DU(prof_idx,:)+fcn_rate_calculate_with_PER(record_SINR_MAC_Power_Fair_2db_NoHistory_DU, snrtable, packet_size, Target_PER);
+            ave_rate_MAC_Power_Fair_3db_NoHistory_DU(prof_idx,:)=ave_rate_MAC_Power_Fair_3db_NoHistory_DU(prof_idx,:)+fcn_rate_calculate_with_PER(record_SINR_MAC_Power_Fair_3db_NoHistory_DU, snrtable, packet_size, Target_PER);
+            ave_rate_MAC_Power_Fair_1db_History_DU(prof_idx,:)=ave_rate_MAC_Power_Fair_1db_History_DU(prof_idx,:)+fcn_rate_calculate_with_PER(record_SINR_MAC_Power_Fair_1db_History_DU, snrtable, packet_size, Target_PER);
+            ave_rate_MAC_Power_Fair_2db_History_DU(prof_idx,:)=ave_rate_MAC_Power_Fair_2db_History_DU(prof_idx,:)+fcn_rate_calculate_with_PER(record_SINR_MAC_Power_Fair_2db_History_DU, snrtable, packet_size, Target_PER);
+            ave_rate_MAC_Power_Fair_3db_History_DU(prof_idx,:)=ave_rate_MAC_Power_Fair_3db_History_DU(prof_idx,:)+fcn_rate_calculate_with_PER(record_SINR_MAC_Power_Fair_3db_History_DU, snrtable, packet_size, Target_PER);
+
+            ave_rate_MAC_Power_UnFair_1db_NoHistory_DU(prof_idx,:)=ave_rate_MAC_Power_UnFair_1db_NoHistory_DU(prof_idx,:)+fcn_rate_calculate_with_PER(record_SINR_MAC_Power_UnFair_1db_NoHistory_DU, snrtable, packet_size, Target_PER);
+            ave_rate_MAC_Power_UnFair_2db_NoHistory_DU(prof_idx,:)=ave_rate_MAC_Power_UnFair_2db_NoHistory_DU(prof_idx,:)+fcn_rate_calculate_with_PER(record_SINR_MAC_Power_UnFair_2db_NoHistory_DU, snrtable, packet_size, Target_PER);
+            ave_rate_MAC_Power_UnFair_3db_NoHistory_DU(prof_idx,:)=ave_rate_MAC_Power_UnFair_3db_NoHistory_DU(prof_idx,:)+fcn_rate_calculate_with_PER(record_SINR_MAC_Power_UnFair_3db_NoHistory_DU, snrtable, packet_size, Target_PER);
+            ave_rate_MAC_Power_UnFair_1db_History_DU(prof_idx,:)=ave_rate_MAC_Power_UnFair_1db_History_DU(prof_idx,:)+fcn_rate_calculate_with_PER(record_SINR_MAC_Power_UnFair_1db_History_DU, snrtable, packet_size, Target_PER);
+            ave_rate_MAC_Power_UnFair_2db_History_DU(prof_idx,:)=ave_rate_MAC_Power_UnFair_2db_History_DU(prof_idx,:)+fcn_rate_calculate_with_PER(record_SINR_MAC_Power_UnFair_2db_History_DU, snrtable, packet_size, Target_PER);
+            ave_rate_MAC_Power_UnFair_3db_History_DU(prof_idx,:)=ave_rate_MAC_Power_UnFair_3db_History_DU(prof_idx,:)+fcn_rate_calculate_with_PER(record_SINR_MAC_Power_UnFair_3db_History_DU, snrtable, packet_size, Target_PER);
+
+            ave_rate_IA_UD(prof_idx,:)=ave_rate_IA_UD(prof_idx,:)+fcn_rate_calculate_with_PER(record_SINR_IA_UD, snrtable, packet_size, Target_PER);
+            ave_rate_IM_UD(prof_idx,:)=ave_rate_IM_UD(prof_idx,:)+fcn_rate_calculate_with_PER(record_SINR_IM_UD, snrtable, packet_size, Target_PER);
+            ave_rate_SM_UD(prof_idx,:)=ave_rate_SM_UD(prof_idx,:)+fcn_rate_calculate_with_PER(record_SINR_SM_UD, snrtable, packet_size, Target_PER);
+            ave_rate_SMM_UD(prof_idx,:)=ave_rate_SMM_UD(prof_idx,:)+fcn_rate_calculate_with_PER(record_SINR_SMM_UD, snrtable, packet_size, Target_PER);
+            ave_rate_SRM_UD(prof_idx,:)=ave_rate_SRM_UD(prof_idx,:)+fcn_rate_calculate_with_PER(record_SINR_SRM_UD, snrtable, packet_size, Target_PER);
+            ave_rate_HD_UD(prof_idx,:)=ave_rate_HD_UD(prof_idx,:)+fcn_rate_calculate_with_PER(record_SINR_HD_UD, snrtable, packet_size, Target_PER);               
         
-        ave_rate_MAC_Power_Fair_1db_NoHistory_DU(k,:)=ave_rate_MAC_Power_Fair_1db_NoHistory_DU(k,:)+fcn_rate_calculate_with_PER(record_SINR_MAC_Power_Fair_1db_NoHistory_DU, snrtable, packet_size, Target_PER);
-        ave_rate_MAC_Power_Fair_2db_NoHistory_DU(k,:)=ave_rate_MAC_Power_Fair_2db_NoHistory_DU(k,:)+fcn_rate_calculate_with_PER(record_SINR_MAC_Power_Fair_2db_NoHistory_DU, snrtable, packet_size, Target_PER);
-        ave_rate_MAC_Power_Fair_3db_NoHistory_DU(k,:)=ave_rate_MAC_Power_Fair_3db_NoHistory_DU(k,:)+fcn_rate_calculate_with_PER(record_SINR_MAC_Power_Fair_3db_NoHistory_DU, snrtable, packet_size, Target_PER);
-        ave_rate_MAC_Power_Fair_1db_History_DU(k,:)=ave_rate_MAC_Power_Fair_1db_History_DU(k,:)+fcn_rate_calculate_with_PER(record_SINR_MAC_Power_Fair_1db_History_DU, snrtable, packet_size, Target_PER);
-        ave_rate_MAC_Power_Fair_2db_History_DU(k,:)=ave_rate_MAC_Power_Fair_2db_History_DU(k,:)+fcn_rate_calculate_with_PER(record_SINR_MAC_Power_Fair_2db_History_DU, snrtable, packet_size, Target_PER);
-        ave_rate_MAC_Power_Fair_3db_History_DU(k,:)=ave_rate_MAC_Power_Fair_3db_History_DU(k,:)+fcn_rate_calculate_with_PER(record_SINR_MAC_Power_Fair_3db_History_DU, snrtable, packet_size, Target_PER);
         
-        ave_rate_MAC_Power_UnFair_1db_NoHistory_DU(k,:)=ave_rate_MAC_Power_UnFair_1db_NoHistory_DU(k,:)+fcn_rate_calculate_with_PER(record_SINR_MAC_Power_UnFair_1db_NoHistory_DU, snrtable, packet_size, Target_PER);
-        ave_rate_MAC_Power_UnFair_2db_NoHistory_DU(k,:)=ave_rate_MAC_Power_UnFair_2db_NoHistory_DU(k,:)+fcn_rate_calculate_with_PER(record_SINR_MAC_Power_UnFair_2db_NoHistory_DU, snrtable, packet_size, Target_PER);
-        ave_rate_MAC_Power_UnFair_3db_NoHistory_DU(k,:)=ave_rate_MAC_Power_UnFair_3db_NoHistory_DU(k,:)+fcn_rate_calculate_with_PER(record_SINR_MAC_Power_UnFair_3db_NoHistory_DU, snrtable, packet_size, Target_PER);
-        ave_rate_MAC_Power_UnFair_1db_History_DU(k,:)=ave_rate_MAC_Power_UnFair_1db_History_DU(k,:)+fcn_rate_calculate_with_PER(record_SINR_MAC_Power_UnFair_1db_History_DU, snrtable, packet_size, Target_PER);
-        ave_rate_MAC_Power_UnFair_2db_History_DU(k,:)=ave_rate_MAC_Power_UnFair_2db_History_DU(k,:)+fcn_rate_calculate_with_PER(record_SINR_MAC_Power_UnFair_2db_History_DU, snrtable, packet_size, Target_PER);
-        ave_rate_MAC_Power_UnFair_3db_History_DU(k,:)=ave_rate_MAC_Power_UnFair_3db_History_DU(k,:)+fcn_rate_calculate_with_PER(record_SINR_MAC_Power_UnFair_3db_History_DU, snrtable, packet_size, Target_PER);
-                       
-        ave_rate_IA_UD(k,:)=ave_rate_IA_UD(k,:)+fcn_rate_calculate_with_PER(record_SINR_IA_UD, snrtable, packet_size, Target_PER);
-        ave_rate_IM_UD(k,:)=ave_rate_IM_UD(k,:)+fcn_rate_calculate_with_PER(record_SINR_IM_UD, snrtable, packet_size, Target_PER);
-        ave_rate_SM_UD(k,:)=ave_rate_SM_UD(k,:)+fcn_rate_calculate_with_PER(record_SINR_SM_UD, snrtable, packet_size, Target_PER);
-        ave_rate_SMM_UD(k,:)=ave_rate_SMM_UD(k,:)+fcn_rate_calculate_with_PER(record_SINR_SMM_UD, snrtable, packet_size, Target_PER);
-        ave_rate_SRM_UD(k,:)=ave_rate_SRM_UD(k,:)+fcn_rate_calculate_with_PER(record_SINR_SRM_UD, snrtable, packet_size, Target_PER);
-        ave_rate_HD_UD(k,:)=ave_rate_HD_UD(k,:)+fcn_rate_calculate_with_PER(record_SINR_HD_UD, snrtable, packet_size, Target_PER);               
+            % calculate rate based on SINR and sum up
+            %ave_rate_IA_DU(k,:)=ave_rate_IA_DU(k,:)+fcn_rate_calculate(record_SINR_IA_DU);
+            %ave_rate_IM_DU(k,:)=ave_rate_IM_DU(k,:)+fcn_rate_calculate(record_SINR_IM_DU);
+            %ave_rate_SM_DU(k,:)=ave_rate_SM_DU(k,:)+fcn_rate_calculate(record_SINR_SM_DU);
+            %ave_rate_SMM_DU(k,:)=ave_rate_SMM_DU(k,:)+fcn_rate_calculate(record_SINR_SMM_DU);
+            %ave_rate_SRM_DU(k,:)=ave_rate_SRM_DU(k,:)+fcn_rate_calculate(record_SINR_SRM_DU);
+            %ave_rate_HD_DU(k,:)=ave_rate_HD_DU(k,:)+fcn_rate_calculate(record_SINR_HD_DU);
+            %ave_rate_MAC_DU(k,:)=ave_rate_MAC_DU(k,:)+fcn_rate_calculate(record_SINR_MAC_DU);
+
+            %ave_rate_IA_UD(k,:)=ave_rate_IA_UD(k,:)+fcn_rate_calculate(record_SINR_IA_UD);
+            %ave_rate_IM_UD(k,:)=ave_rate_IM_UD(k,:)+fcn_rate_calculate(record_SINR_IM_UD);
+            %ave_rate_SM_UD(k,:)=ave_rate_SM_UD(k,:)+fcn_rate_calculate(record_SINR_SM_UD);
+            %ave_rate_SMM_UD(k,:)=ave_rate_SMM_UD(k,:)+fcn_rate_calculate(record_SINR_SMM_UD);
+            %ave_rate_SRM_UD(k,:)=ave_rate_SRM_UD(k,:)+fcn_rate_calculate(record_SINR_SRM_UD);
+            %ave_rate_HD_UD(k,:)=ave_rate_HD_UD(k,:)+fcn_rate_calculate(record_SINR_HD_UD);
         
-        
-        % calculate rate based on SINR and sum up
-        %ave_rate_IA_DU(k,:)=ave_rate_IA_DU(k,:)+fcn_rate_calculate(record_SINR_IA_DU);
-        %ave_rate_IM_DU(k,:)=ave_rate_IM_DU(k,:)+fcn_rate_calculate(record_SINR_IM_DU);
-        %ave_rate_SM_DU(k,:)=ave_rate_SM_DU(k,:)+fcn_rate_calculate(record_SINR_SM_DU);
-        %ave_rate_SMM_DU(k,:)=ave_rate_SMM_DU(k,:)+fcn_rate_calculate(record_SINR_SMM_DU);
-        %ave_rate_SRM_DU(k,:)=ave_rate_SRM_DU(k,:)+fcn_rate_calculate(record_SINR_SRM_DU);
-        %ave_rate_HD_DU(k,:)=ave_rate_HD_DU(k,:)+fcn_rate_calculate(record_SINR_HD_DU);
-        %ave_rate_MAC_DU(k,:)=ave_rate_MAC_DU(k,:)+fcn_rate_calculate(record_SINR_MAC_DU);
-        
-        %ave_rate_IA_UD(k,:)=ave_rate_IA_UD(k,:)+fcn_rate_calculate(record_SINR_IA_UD);
-        %ave_rate_IM_UD(k,:)=ave_rate_IM_UD(k,:)+fcn_rate_calculate(record_SINR_IM_UD);
-        %ave_rate_SM_UD(k,:)=ave_rate_SM_UD(k,:)+fcn_rate_calculate(record_SINR_SM_UD);
-        %ave_rate_SMM_UD(k,:)=ave_rate_SMM_UD(k,:)+fcn_rate_calculate(record_SINR_SMM_UD);
-        %ave_rate_SRM_UD(k,:)=ave_rate_SRM_UD(k,:)+fcn_rate_calculate(record_SINR_SRM_UD);
-        %ave_rate_HD_UD(k,:)=ave_rate_HD_UD(k,:)+fcn_rate_calculate(record_SINR_HD_UD);
-        
-%         ave_SINR_IA_DU_AP(k,1)=ave_SINR_IA_DU_AP(k,1)+sum(record_SINR_IA_DU(1,:))/nnz(record_traffic_IA_DU(1,:));
-%         ave_SINR_IM_DU_AP(k,1)=ave_SINR_IM_DU_AP(k,1)+sum(record_SINR_IM_DU(1,:))/nnz(record_traffic_IM_DU(1,:));
-%         ave_SINR_SM_DU_AP(k,1)=ave_SINR_SM_DU_AP(k,1)+sum(record_SINR_SM_DU(1,:))/nnz(record_traffic_SM_DU(1,:));
-%         ave_SINR_SMM_DU_AP(k,1)=ave_SINR_SMM_DU_AP(k,1)+sum(record_SINR_SMM_DU(1,:))/nnz(record_traffic_SMM_DU(1,:));
-%         ave_SINR_SRM_DU_AP(k,1)=ave_SINR_SRM_DU_AP(k,1)+sum(record_SINR_SRM_DU(1,:))/nnz(record_traffic_SRM_DU(1,:));
-%         %      ave_SINR_HD_DU_AP(k,1)=ave_SINR_HD_DU_AP(k,1)+sum(record_SINR_HD_DU(1,:))/nnz(record_traffic_HD_DU(1,:));
-%         
-%         ave_SINR_IA_UD_AP(k,1)=ave_SINR_IA_UD_AP(k,1)+sum(record_SINR_IA_UD(1,:))/nnz(record_traffic_IA_UD(1,:));
-%         ave_SINR_IM_UD_AP(k,1)=ave_SINR_IM_UD_AP(k,1)+sum(record_SINR_IM_UD(1,:))/nnz(record_traffic_IM_UD(1,:));
-%         ave_SINR_SM_UD_AP(k,1)=ave_SINR_SM_UD_AP(k,1)+sum(record_SINR_SM_UD(1,:))/nnz(record_traffic_SM_UD(1,:));
-%         ave_SINR_SMM_UD_AP(k,1)=ave_SINR_SMM_UD_AP(k,1)+sum(record_SINR_SMM_UD(1,:))/nnz(record_traffic_SMM_UD(1,:));
-%         ave_SINR_SRM_UD_AP(k,1)=ave_SINR_SRM_UD_AP(k,1)+sum(record_SINR_SRM_UD(1,:))/nnz(record_traffic_SRM_UD(1,:));
-%         ave_SINR_HD_UD_AP(k,1)=ave_SINR_HD_UD_AP(k,1)+sum(record_SINR_HD_UD(1,:))/nnz(record_traffic_HD_UD(1,:));
-%         
-%         ave_SINR_IA_DU_STA(k,1)=ave_SINR_IA_DU_STA(k,1)+sum(record_SINR_IA_DU(2,:))/nnz(record_traffic_IA_DU(2,:));
-%         ave_SINR_IM_DU_STA(k,1)=ave_SINR_IM_DU_STA(k,1)+sum(record_SINR_IM_DU(2,:))/nnz(record_traffic_IM_DU(2,:));
-%         ave_SINR_SM_DU_STA(k,1)=ave_SINR_SM_DU_STA(k,1)+sum(record_SINR_SM_DU(2,:))/nnz(record_traffic_SM_DU(2,:));
-%         ave_SINR_SMM_DU_STA(k,1)=ave_SINR_SMM_DU_STA(k,1)+sum(record_SINR_SMM_DU(2,:))/nnz(record_traffic_SMM_DU(2,:));
-%         ave_SINR_SRM_DU_STA(k,1)=ave_SINR_SRM_DU_STA(k,1)+sum(record_SINR_SRM_DU(2,:))/nnz(record_traffic_SRM_DU(2,:));
-%         ave_SINR_HD_DU_STA(k,1)=ave_SINR_HD_DU_STA(k,1)+sum(record_SINR_HD_DU(2,:))/nnz(record_traffic_HD_DU(2,:));
-%         
-%         ave_SINR_IA_UD_STA(k,1)=ave_SINR_IA_UD_STA(k,1)+sum(record_SINR_IA_UD(2,:))/nnz(record_traffic_IA_UD(2,:));
-%         ave_SINR_IM_UD_STA(k,1)=ave_SINR_IM_UD_STA(k,1)+sum(record_SINR_IM_UD(2,:))/nnz(record_traffic_IM_UD(2,:));
-%         ave_SINR_SM_UD_STA(k,1)=ave_SINR_SM_UD_STA(k,1)+sum(record_SINR_SM_UD(2,:))/nnz(record_traffic_SM_UD(2,:));
-%         ave_SINR_SMM_UD_STA(k,1)=ave_SINR_SMM_UD_STA(k,1)+sum(record_SINR_SMM_UD(2,:))/nnz(record_traffic_SMM_UD(2,:));
-%         ave_SINR_SRM_UD_STA(k,1)=ave_SINR_SRM_UD_STA(k,1)+sum(record_SINR_SRM_UD(2,:))/nnz(record_traffic_SRM_UD(2,:));
-%         %       ave_SINR_HD_UD_STA(k,1)=ave_SINR_HD_UD_STA(k,1)+sum(record_SINR_HD_UD(2,:))/nnz(record_traffic_HD_UD(2,:));
-%         
-%         ave_traffic_IA_DU_D(k,1)=ave_traffic_IA_DU_D(k,1)+nnz(record_traffic_IA_DU(2,:))/total_time;
-%         ave_traffic_IM_DU_D(k,1)=ave_traffic_IM_DU_D(k,1)+nnz(record_traffic_IM_DU(2,:))/total_time;
-%         ave_traffic_SM_DU_D(k,1)=ave_traffic_SM_DU_D(k,1)+nnz(record_traffic_SM_DU(2,:))/total_time;
-%         ave_traffic_SMM_DU_D(k,1)=ave_traffic_SMM_DU_D(k,1)+nnz(record_traffic_SMM_DU(2,:))/total_time;
-%         ave_traffic_SRM_DU_D(k,1)=ave_traffic_SRM_DU_D(k,1)+nnz(record_traffic_SRM_DU(2,:))/total_time;
-%         ave_traffic_HD_DU_D(k,1)=ave_traffic_HD_DU_D(k,1)+nnz(record_traffic_HD_DU(2,:))/total_time;
-%         
-%         ave_traffic_IA_DU_U(k,1)=ave_traffic_IA_DU_U(k,1)+nnz(record_traffic_IA_DU(1,:))/total_time;
-%         ave_traffic_IM_DU_U(k,1)=ave_traffic_IM_DU_U(k,1)+nnz(record_traffic_IM_DU(1,:))/total_time;
-%         ave_traffic_SM_DU_U(k,1)=ave_traffic_SM_DU_U(k,1)+nnz(record_traffic_SM_DU(1,:))/total_time;
-%         ave_traffic_SMM_DU_U(k,1)=ave_traffic_SMM_DU_U(k,1)+nnz(record_traffic_SMM_DU(1,:))/total_time;
-%         ave_traffic_SRM_DU_U(k,1)=ave_traffic_SRM_DU_U(k,1)+nnz(record_traffic_SRM_DU(1,:))/total_time;
-%         ave_traffic_HD_DU_U(k,1)=ave_traffic_HD_DU_U(k,1)+nnz(record_traffic_HD_DU(1,:))/total_time;
-%         
-%         ave_traffic_IA_UD_D(k,1)=ave_traffic_IA_UD_D(k,1)+nnz(record_traffic_IA_UD(2,:))/total_time;
-%         ave_traffic_IM_UD_D(k,1)=ave_traffic_IM_UD_D(k,1)+nnz(record_traffic_IM_UD(2,:))/total_time;
-%         ave_traffic_SM_UD_D(k,1)=ave_traffic_SM_UD_D(k,1)+nnz(record_traffic_SM_UD(2,:))/total_time;
-%         ave_traffic_SMM_UD_D(k,1)=ave_traffic_SMM_UD_D(k,1)+nnz(record_traffic_SMM_UD(2,:))/total_time;
-%         ave_traffic_SRM_UD_D(k,1)=ave_traffic_SRM_UD_D(k,1)+nnz(record_traffic_SRM_UD(2,:))/total_time;
-%         ave_traffic_HD_UD_D(k,1)=ave_traffic_HD_UD_D(k,1)+nnz(record_traffic_HD_UD(2,:))/total_time;
-%         
-%         ave_traffic_IA_UD_U(k,1)=ave_traffic_IA_UD_U(k,1)+nnz(record_traffic_IA_UD(1,:))/total_time;
-%         ave_traffic_IM_UD_U(k,1)=ave_traffic_IM_UD_U(k,1)+nnz(record_traffic_IM_UD(1,:))/total_time;
-%         ave_traffic_SM_UD_U(k,1)=ave_traffic_SM_UD_U(k,1)+nnz(record_traffic_SM_UD(1,:))/total_time;
-%         ave_traffic_SMM_UD_U(k,1)=ave_traffic_SMM_UD_U(k,1)+nnz(record_traffic_SMM_UD(1,:))/total_time;
-%         ave_traffic_SRM_UD_U(k,1)=ave_traffic_SRM_UD_U(k,1)+nnz(record_traffic_SRM_UD(1,:))/total_time;
-%         ave_traffic_HD_UD_U(k,1)=ave_traffic_HD_UD_U(k,1)+nnz(record_traffic_HD_UD(1,:))/total_time;
         end
     
-    %Plot CDF for uplink power
-    %{
-    figure(k)
-    hold on
-    cdf_1db_perfect=cdfplot(record_power_UpLink_1db_Perfect);    
-    set(cdf_1db_perfect,'color','red');
-    %cdfplot(record_power_UpLink_2db_Perfect);
-    %color('green');
-    %cdfplot(record_power_UpLink_3db_Perfect);
-    %color('red');
-    cdf_1db_history=cdfplot(record_power_UpLink_1db_History);
-    set(cdf_1db_history,'color','red');
-    %cdfplot(record_power_UpLink_2db_History);
-    %color('magenta');
-    %cdfplot(record_power_UpLink_3db_History);
-    %color('yellow');
-    legend('1db perfect','1db history','Location','NorthEast');
-    hold off
-    %}
-     ave_rate_IA_DU(k,:)=ave_rate_IA_DU(k,:)/Monte_Carlo_T;
-     ave_rate_IM_DU(k,:)=ave_rate_IM_DU(k,:)/Monte_Carlo_T;
-     ave_rate_SM_DU(k,:)=ave_rate_SM_DU(k,:)/Monte_Carlo_T;
-     ave_rate_SMM_DU(k,:)=ave_rate_SMM_DU(k,:)/Monte_Carlo_T;
-     ave_rate_SRM_DU(k,:)=ave_rate_SRM_DU(k,:)/Monte_Carlo_T;
-     ave_rate_HD_DU(k,:)=ave_rate_HD_DU(k,:)/Monte_Carlo_T;
-     
-     ave_rate_MAC_Power_Fair_1db_NoHistory_DU(k,:)=ave_rate_MAC_Power_Fair_1db_NoHistory_DU(k,:)/Monte_Carlo_T;
-     ave_rate_MAC_Power_Fair_2db_NoHistory_DU(k,:)=ave_rate_MAC_Power_Fair_2db_NoHistory_DU(k,:)/Monte_Carlo_T;
-     ave_rate_MAC_Power_Fair_3db_NoHistory_DU(k,:)=ave_rate_MAC_Power_Fair_3db_NoHistory_DU(k,:)/Monte_Carlo_T;
-     ave_rate_MAC_Power_Fair_1db_History_DU(k,:)=ave_rate_MAC_Power_Fair_1db_History_DU(k,:)/Monte_Carlo_T;
-     ave_rate_MAC_Power_Fair_2db_History_DU(k,:)=ave_rate_MAC_Power_Fair_2db_History_DU(k,:)/Monte_Carlo_T;
-     ave_rate_MAC_Power_Fair_3db_History_DU(k,:)=ave_rate_MAC_Power_Fair_3db_History_DU(k,:)/Monte_Carlo_T;
-     
-     ave_rate_MAC_Power_UnFair_1db_NoHistory_DU(k,:)=ave_rate_MAC_Power_UnFair_1db_NoHistory_DU(k,:)/Monte_Carlo_T;
-     ave_rate_MAC_Power_UnFair_2db_NoHistory_DU(k,:)=ave_rate_MAC_Power_UnFair_2db_NoHistory_DU(k,:)/Monte_Carlo_T;
-     ave_rate_MAC_Power_UnFair_3db_NoHistory_DU(k,:)=ave_rate_MAC_Power_UnFair_3db_NoHistory_DU(k,:)/Monte_Carlo_T;
-     ave_rate_MAC_Power_UnFair_1db_History_DU(k,:)=ave_rate_MAC_Power_UnFair_1db_History_DU(k,:)/Monte_Carlo_T;
-     ave_rate_MAC_Power_UnFair_2db_History_DU(k,:)=ave_rate_MAC_Power_UnFair_2db_History_DU(k,:)/Monte_Carlo_T;
-     ave_rate_MAC_Power_UnFair_3db_History_DU(k,:)=ave_rate_MAC_Power_UnFair_3db_History_DU(k,:)/Monte_Carlo_T;
-     
-     ave_rate_IA_UD(k,:)=ave_rate_IA_UD(k,:)/Monte_Carlo_T;
-     ave_rate_IM_UD(k,:)=ave_rate_IM_UD(k,:)/Monte_Carlo_T;
-     ave_rate_SM_UD(k,:)=ave_rate_SM_UD(k,:)/Monte_Carlo_T;
-     ave_rate_SMM_UD(k,:)=ave_rate_SMM_UD(k,:)/Monte_Carlo_T;
-     ave_rate_SRM_UD(k,:)=ave_rate_SRM_UD(k,:)/Monte_Carlo_T;
-     ave_rate_HD_UD(k,:)=ave_rate_HD_UD(k,:)/Monte_Carlo_T;
-%     
-%     ave_SINR_IA_DU_AP(k,1)=ave_SINR_IA_DU_AP(k,1)/Monte_Carlo_T;
-%     ave_SINR_IM_DU_AP(k,1)=ave_SINR_IM_DU_AP(k,1)/Monte_Carlo_T;
-%     ave_SINR_SM_DU_AP(k,1)=ave_SINR_SM_DU_AP(k,1)/Monte_Carlo_T;
-%     ave_SINR_SMM_DU_AP(k,1)=ave_SINR_SMM_DU_AP(k,1)/Monte_Carlo_T;
-%     ave_SINR_SRM_DU_AP(k,1)=ave_SINR_SRM_DU_AP(k,1)/Monte_Carlo_T;
-%     ave_SINR_HD_DU_AP(k,1)=ave_SINR_HD_DU_AP(k,1)/Monte_Carlo_T;
-%     
-%     ave_SINR_IA_UD_AP(k,1)=ave_SINR_IA_UD_AP(k,1)/Monte_Carlo_T;
-%     ave_SINR_IM_UD_AP(k,1)=ave_SINR_IM_UD_AP(k,1)/Monte_Carlo_T;
-%     ave_SINR_SM_UD_AP(k,1)=ave_SINR_SM_UD_AP(k,1)/Monte_Carlo_T;
-%     ave_SINR_SMM_UD_AP(k,1)=ave_SINR_SMM_UD_AP(k,1)/Monte_Carlo_T;
-%     ave_SINR_SRM_UD_AP(k,1)=ave_SINR_SRM_UD_AP(k,1)/Monte_Carlo_T;
-%     ave_SINR_HD_UD_AP(k,1)=ave_SINR_HD_UD_AP(k,1)/Monte_Carlo_T;
-%     
-%     ave_SINR_IA_DU_STA(k,1)=ave_SINR_IA_DU_STA(k,1)/Monte_Carlo_T;
-%     ave_SINR_IM_DU_STA(k,1)=ave_SINR_IM_DU_STA(k,1)/Monte_Carlo_T;
-%     ave_SINR_SM_DU_STA(k,1)=ave_SINR_SM_DU_STA(k,1)/Monte_Carlo_T;
-%     ave_SINR_SMM_DU_STA(k,1)=ave_SINR_SMM_DU_STA(k,1)/Monte_Carlo_T;
-%     ave_SINR_SRM_DU_STA(k,1)=ave_SINR_SRM_DU_STA(k,1)/Monte_Carlo_T;
-%     ave_SINR_HD_DU_STA(k,1)=ave_SINR_HD_DU_STA(k,1)/Monte_Carlo_T;
-%     
-%     ave_SINR_IA_UD_STA(k,1)=ave_SINR_IA_UD_STA(k,1)/Monte_Carlo_T;
-%     ave_SINR_IM_UD_STA(k,1)=ave_SINR_IM_UD_STA(k,1)/Monte_Carlo_T;
-%     ave_SINR_SM_UD_STA(k,1)=ave_SINR_SM_UD_STA(k,1)/Monte_Carlo_T;
-%     ave_SINR_SMM_UD_STA(k,1)=ave_SINR_SMM_UD_STA(k,1)/Monte_Carlo_T;
-%     ave_SINR_SRM_UD_STA(k,1)=ave_SINR_SRM_UD_STA(k,1)/Monte_Carlo_T;
-%     ave_SINR_HD_UD_STA(k,1)=ave_SINR_HD_UD_STA(k,1)/Monte_Carlo_T;
-%     
-%     ave_traffic_IA_DU_D(k,1)=ave_traffic_IA_DU_D(k,1)/Monte_Carlo_T;
-%     ave_traffic_IM_DU_D(k,1)=ave_traffic_IM_DU_D(k,1)/Monte_Carlo_T;
-%     ave_traffic_SM_DU_D(k,1)=ave_traffic_SM_DU_D(k,1)/Monte_Carlo_T;
-%     ave_traffic_SMM_DU_D(k,1)=ave_traffic_SMM_DU_D(k,1)/Monte_Carlo_T;
-%     ave_traffic_SRM_DU_D(k,1)=ave_traffic_SRM_DU_D(k,1)/Monte_Carlo_T;
-%     ave_traffic_HD_DU_D(k,1)=ave_traffic_HD_DU_D(k,1)/Monte_Carlo_T;
-%     
-%     ave_traffic_IA_DU_U(k,1)=ave_traffic_IA_DU_U(k,1)/Monte_Carlo_T;
-%     ave_traffic_IM_DU_U(k,1)=ave_traffic_IM_DU_U(k,1)/Monte_Carlo_T;
-%     ave_traffic_SM_DU_U(k,1)=ave_traffic_SM_DU_U(k,1)/Monte_Carlo_T;
-%     ave_traffic_SMM_DU_U(k,1)=ave_traffic_SMM_DU_U(k,1)/Monte_Carlo_T;
-%     ave_traffic_SRM_DU_U(k,1)=ave_traffic_SRM_DU_U(k,1)/Monte_Carlo_T;
-%     ave_traffic_HD_DU_U(k,1)=ave_traffic_HD_DU_U(k,1)/Monte_Carlo_T;
-%     
-%     ave_traffic_IA_UD_D(k,1)=ave_traffic_IA_UD_D(k,1)/Monte_Carlo_T;
-%     ave_traffic_IM_UD_D(k,1)=ave_traffic_IM_UD_D(k,1)/Monte_Carlo_T;
-%     ave_traffic_SM_UD_D(k,1)=ave_traffic_SM_UD_D(k,1)/Monte_Carlo_T;
-%     ave_traffic_SMM_UD_D(k,1)=ave_traffic_SMM_UD_D(k,1)/Monte_Carlo_T;
-%     ave_traffic_SRM_UD_D(k,1)=ave_traffic_SRM_UD_D(k,1)/Monte_Carlo_T;
-%     ave_traffic_HD_UD_D(k,1)=ave_traffic_HD_UD_D(k,1)/Monte_Carlo_T;
-%     
-%     ave_traffic_IA_UD_U(k,1)=ave_traffic_IA_UD_U(k,1)/Monte_Carlo_T;
-%     ave_traffic_IM_UD_U(k,1)=ave_traffic_IM_UD_U(k,1)/Monte_Carlo_T;
-%     ave_traffic_SM_UD_U(k,1)=ave_traffic_SM_UD_U(k,1)/Monte_Carlo_T;
-%     ave_traffic_SMM_UD_U(k,1)=ave_traffic_SMM_UD_U(k,1)/Monte_Carlo_T;
-%     ave_traffic_SRM_UD_U(k,1)=ave_traffic_SRM_UD_U(k,1)/Monte_Carlo_T;
-%     ave_traffic_HD_UD_U(k,1)=ave_traffic_HD_UD_U(k,1)/Monte_Carlo_T;
+    
+        ave_rate_IA_DU(prof_idx,:)=ave_rate_IA_DU(prof_idx,:)/Monte_Carlo_T;
+        ave_rate_IM_DU(prof_idx,:)=ave_rate_IM_DU(prof_idx,:)/Monte_Carlo_T;
+        ave_rate_SM_DU(prof_idx,:)=ave_rate_SM_DU(prof_idx,:)/Monte_Carlo_T;
+        ave_rate_SMM_DU(prof_idx,:)=ave_rate_SMM_DU(prof_idx,:)/Monte_Carlo_T;
+        ave_rate_SRM_DU(prof_idx,:)=ave_rate_SRM_DU(prof_idx,:)/Monte_Carlo_T;
+        ave_rate_HD_DU(prof_idx,:)=ave_rate_HD_DU(prof_idx,:)/Monte_Carlo_T;
+
+        ave_rate_MAC_Power_Fair_1db_NoHistory_DU(prof_idx,:)=ave_rate_MAC_Power_Fair_1db_NoHistory_DU(prof_idx,:)/Monte_Carlo_T;
+        ave_rate_MAC_Power_Fair_2db_NoHistory_DU(prof_idx,:)=ave_rate_MAC_Power_Fair_2db_NoHistory_DU(prof_idx,:)/Monte_Carlo_T;
+        ave_rate_MAC_Power_Fair_3db_NoHistory_DU(prof_idx,:)=ave_rate_MAC_Power_Fair_3db_NoHistory_DU(prof_idx,:)/Monte_Carlo_T;
+        ave_rate_MAC_Power_Fair_1db_History_DU(prof_idx,:)=ave_rate_MAC_Power_Fair_1db_History_DU(prof_idx,:)/Monte_Carlo_T;
+        ave_rate_MAC_Power_Fair_2db_History_DU(prof_idx,:)=ave_rate_MAC_Power_Fair_2db_History_DU(prof_idx,:)/Monte_Carlo_T;
+        ave_rate_MAC_Power_Fair_3db_History_DU(prof_idx,:)=ave_rate_MAC_Power_Fair_3db_History_DU(prof_idx,:)/Monte_Carlo_T;
+
+        ave_rate_MAC_Power_UnFair_1db_NoHistory_DU(prof_idx,:)=ave_rate_MAC_Power_UnFair_1db_NoHistory_DU(prof_idx,:)/Monte_Carlo_T;
+        ave_rate_MAC_Power_UnFair_2db_NoHistory_DU(prof_idx,:)=ave_rate_MAC_Power_UnFair_2db_NoHistory_DU(prof_idx,:)/Monte_Carlo_T;
+        ave_rate_MAC_Power_UnFair_3db_NoHistory_DU(prof_idx,:)=ave_rate_MAC_Power_UnFair_3db_NoHistory_DU(prof_idx,:)/Monte_Carlo_T;
+        ave_rate_MAC_Power_UnFair_1db_History_DU(prof_idx,:)=ave_rate_MAC_Power_UnFair_1db_History_DU(prof_idx,:)/Monte_Carlo_T;
+        ave_rate_MAC_Power_UnFair_2db_History_DU(prof_idx,:)=ave_rate_MAC_Power_UnFair_2db_History_DU(prof_idx,:)/Monte_Carlo_T;
+        ave_rate_MAC_Power_UnFair_3db_History_DU(prof_idx,:)=ave_rate_MAC_Power_UnFair_3db_History_DU(prof_idx,:)/Monte_Carlo_T;
+
+        ave_rate_IA_UD(prof_idx,:)=ave_rate_IA_UD(prof_idx,:)/Monte_Carlo_T;
+        ave_rate_IM_UD(prof_idx,:)=ave_rate_IM_UD(prof_idx,:)/Monte_Carlo_T;
+        ave_rate_SM_UD(prof_idx,:)=ave_rate_SM_UD(prof_idx,:)/Monte_Carlo_T;
+        ave_rate_SMM_UD(prof_idx,:)=ave_rate_SMM_UD(prof_idx,:)/Monte_Carlo_T;
+        ave_rate_SRM_UD(prof_idx,:)=ave_rate_SRM_UD(prof_idx,:)/Monte_Carlo_T;
+        ave_rate_HD_UD(prof_idx,:)=ave_rate_HD_UD(prof_idx,:)/Monte_Carlo_T;
 
 
 
-ave_rate_DU_with_channelgain=[ave_rate_IA_DU ave_rate_IM_DU ave_rate_SM_DU ave_rate_SMM_DU ave_rate_SRM_DU ave_rate_HD_DU ave_rate_MAC_DU]; 
-ave_rate_UD_with_channelgain=[ave_rate_IA_UD ave_rate_IM_UD ave_rate_SM_UD ave_rate_SMM_UD ave_rate_SRM_UD ave_rate_HD_UD];
 
-ave_rate_DU_MAC_Power_Fair=[ave_rate_MAC_Power_Fair_1db_NoHistory_DU ave_rate_MAC_Power_Fair_2db_NoHistory_DU ave_rate_MAC_Power_Fair_3db_NoHistory_DU ave_rate_MAC_Power_Fair_1db_History_DU ave_rate_MAC_Power_Fair_2db_History_DU ave_rate_MAC_Power_Fair_3db_History_DU];
-ave_rate_DU_MAC_Power_UnFair=[ave_rate_MAC_Power_UnFair_1db_NoHistory_DU ave_rate_MAC_Power_UnFair_2db_NoHistory_DU ave_rate_MAC_Power_UnFair_3db_NoHistory_DU ave_rate_MAC_Power_UnFair_1db_History_DU ave_rate_MAC_Power_UnFair_2db_History_DU ave_rate_MAC_Power_UnFair_3db_History_DU];
-
-% ave_SINR_DU_AP_with_channelgain=[ave_SINR_IA_DU_AP ave_SINR_IM_DU_AP ave_SINR_SM_DU_AP ave_SINR_SMM_DU_AP ave_SINR_SRM_DU_AP ave_SINR_HD_DU_AP];
-% ave_SINR_DU_STA_with_channelgain=[ave_SINR_IA_DU_STA ave_SINR_IM_DU_STA ave_SINR_SM_DU_STA ave_SINR_SMM_DU_STA ave_SINR_SRM_DU_STA ave_SINR_HD_DU_STA];
-% ave_SINR_UD_AP_with_channelgain=[ave_SINR_IA_UD_AP ave_SINR_IM_UD_AP ave_SINR_SM_UD_AP ave_SINR_SMM_UD_AP ave_SINR_SRM_UD_AP ave_SINR_HD_UD_AP];
-% ave_SINR_UD_STA_with_channelgain=[ave_SINR_IA_UD_STA ave_SINR_IM_UD_STA ave_SINR_SM_UD_STA ave_SINR_SMM_UD_STA ave_SINR_SRM_UD_STA ave_SINR_HD_UD_STA];
-% ave_traffic_DU_D_with_channelgain=[ave_traffic_IA_DU_D ave_traffic_IM_DU_D ave_traffic_SM_DU_D ave_traffic_SMM_DU_D ave_traffic_SRM_DU_D ave_traffic_HD_DU_D];
-% ave_traffic_DU_U_with_channelgain=[ave_traffic_IA_DU_U ave_traffic_IM_DU_U ave_traffic_SM_DU_U ave_traffic_SMM_DU_U ave_traffic_SRM_DU_U ave_traffic_HD_DU_U];
-% ave_traffic_UD_D_with_channelgain=[ave_traffic_IA_UD_D ave_traffic_IM_UD_D ave_traffic_SM_UD_D ave_traffic_SMM_UD_D ave_traffic_SRM_UD_D ave_traffic_HD_UD_D];
-% ave_traffic_UD_U_with_channelgain=[ave_traffic_IA_UD_U ave_traffic_IM_UD_U ave_traffic_SM_UD_U ave_traffic_SMM_UD_U ave_traffic_SRM_UD_U ave_traffic_HD_UD_U];
-save with_channelgainv3;
-save with_channelgainv3_rate ave_rate_DU_with_channelgain ave_rate_UD_with_channelgain ;
-
-save MAC_Power_Fair ave_rate_DU_MAC_Power_Fair ave_rate_DU_MAC_Power_UnFair;
+        
 
     end
+    
+    
+    
+    ave_rate_DU_with_channelgain=[ave_rate_IA_DU ave_rate_IM_DU ave_rate_SM_DU ave_rate_SMM_DU ave_rate_SRM_DU ave_rate_HD_DU ave_rate_MAC_DU]; 
+    ave_rate_UD_with_channelgain=[ave_rate_IA_UD ave_rate_IM_UD ave_rate_SM_UD ave_rate_SMM_UD ave_rate_SRM_UD ave_rate_HD_UD];
+
+    ave_rate_DU_MAC_Power_Fair=[ave_rate_MAC_Power_Fair_1db_NoHistory_DU ave_rate_MAC_Power_Fair_2db_NoHistory_DU ave_rate_MAC_Power_Fair_3db_NoHistory_DU ave_rate_MAC_Power_Fair_1db_History_DU ave_rate_MAC_Power_Fair_2db_History_DU ave_rate_MAC_Power_Fair_3db_History_DU];
+    ave_rate_DU_MAC_Power_UnFair=[ave_rate_MAC_Power_UnFair_1db_NoHistory_DU ave_rate_MAC_Power_UnFair_2db_NoHistory_DU ave_rate_MAC_Power_UnFair_3db_NoHistory_DU ave_rate_MAC_Power_UnFair_1db_History_DU ave_rate_MAC_Power_UnFair_2db_History_DU ave_rate_MAC_Power_UnFair_3db_History_DU];
+
+    current_profile = Profiles(exper_idx, :);
+    
+    save(result_file_path, 'current_profile', 'ave_rate_DU_with_channelgain', 'ave_rate_UD_with_channelgain', 'ave_rate_DU_MAC_Power_Fair', 'ave_rate_DU_MAC_Power_UnFair');
+    
+    %save with_channelgainv3;
+    %save with_channelgainv3_rate ave_rate_DU_with_channelgain ave_rate_UD_with_channelgain ;
+
+    %save MAC_Power_Fair ave_rate_DU_MAC_Power_Fair ave_rate_DU_MAC_Power_UnFair;
 
 end
 % save with_channelgainv3_SINR ave_SINR_DU_AP_with_channelgain ave_SINR_DU_STA_with_channelgain ave_SINR_UD_AP_with_channelgain ave_SINR_UD_STA_with_channelgain;
