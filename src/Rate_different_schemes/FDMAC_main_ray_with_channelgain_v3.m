@@ -680,6 +680,8 @@ for exper_idx=1:experiment_num
 
     current_profile = Profiles(exper_idx, :);
     
+    mkdir(Profiles(exper_idx, 1).log_path);
+    save('Profiles', 'Profiles');
     save(result_file_path, 'current_profile', 'ave_rate_DU_with_channelgain', 'ave_rate_UD_with_channelgain', 'ave_rate_DU_MAC_Power_Fair', 'ave_rate_DU_MAC_Power_UnFair');
     
     %save with_channelgainv3;
