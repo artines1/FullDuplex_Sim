@@ -25,6 +25,10 @@ Profiles(1, 1).SNR_input=100;% input SNR (dB)
 Profiles(1, 1).SNR_Min_db = 5;
 Profiles(1, 1).SNR_Max_db = 30;
 Profiles(1, 1).log_path='./';
+Profiles(1, 1).graph_title='Self Cancellation Capability';
+Profiles(1, 1).graph_X_axis_title='Self Cancellation Capability (db)';
+Profiles(1, 1).graph_X_axis_values=70:5:100;
+Profiles(1, 1).graph_Y_axis_title='Average Throughput (Mbps)';
 
 Profiles(1 ,2)=Profiles(1, 1);
 Profiles(1 ,2).self_interference_channel_gain_STA=-75;
