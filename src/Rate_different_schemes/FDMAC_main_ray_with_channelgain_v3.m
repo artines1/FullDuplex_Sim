@@ -274,7 +274,7 @@ for exper_idx=1:experiment_num
             record_SINR_SMM_UD=zeros(4,total_time);
             record_SINR_SRM_UD=zeros(4,total_time);
             record_SINR_HD_UD=zeros(4,total_time);
-            recode_SINR_MAC_UD=zeros(4,total_time);
+            record_SINR_MAC_UD=zeros(4,total_time);
 
             traffic_reg_first=zeros(number_STAs,1);%record traffic requirement of STAs for first transmission at each time-slot
             traffic_reg_second=zeros(number_STAs,1);%record traffic requirement of STAs for second transmission at each time-slot
@@ -534,12 +534,16 @@ for exper_idx=1:experiment_num
                         [record_traffic_SMM_UD(2,t) ]=fcn_SINR_Maxmin_UD(transmission_first,traffic_reg_second,num_dn_STA,channel_gain_temp,channel_gain_withAP_temp,noise_power,power_transmit_AP,power_transmit_STA);
                         [record_traffic_SRM_UD(2,t)]=fcn_SumRate_Maximization_UD(transmission_first,traffic_reg_second,num_dn_STA,channel_gain_temp,channel_gain_withAP_temp,noise_power,power_transmit_AP,power_transmit_STA,self_interference_channel_gain_AP);
 
+                        [record_traffic_MAC_UD(2,t)]=fcn_MAC_CW_UD(transmission_first,traffic_reg_second,num_dn_STA,channel_gain_temp,channel_gain_withAP_temp,noise_power,power_transmit_AP,power_transmit_STA);
+                        
                     else
                         record_traffic_IA_UD(2,t)=0;
                         record_traffic_IM_UD(2,t)=0;
                         record_traffic_SM_UD(2,t)=0;
                         record_traffic_SMM_UD(2,t)=0;
-                        record_traffic_SRM_UD(2,t)=0;                                       
+                        record_traffic_SRM_UD(2,t)=0;
+                        
+                        record_traffic_MAC_UD(2,t)=0;
                     end
                     % --------------------------------------------------------%
                 else % There's no uplink traffic
@@ -560,6 +564,8 @@ for exper_idx=1:experiment_num
                         record_traffic_SMM_UD(2,t)=traffic_reg_second(unidrnd(num_dn_STA,1));
                         record_traffic_SRM_UD(2,t)=traffic_reg_second(unidrnd(num_dn_STA,1));
                         record_traffic_HD_UD(2,t)=traffic_reg_second(unidrnd(num_dn_STA,1));
+                        
+                        record_traffic_MAC_UD(2,t)=traffic_reg_second(unidrnd(num_dn_STA,1));
                     else
                         record_traffic_IA_UD(2,t)=0;
                         record_traffic_IM_UD(2,t)=0;
@@ -567,6 +573,8 @@ for exper_idx=1:experiment_num
                         record_traffic_SMM_UD(2,t)=0;
                         record_traffic_SRM_UD(2,t)=0;
                         record_traffic_HD_UD(2,t)=0;
+                        
+                        record_traffic_MAC_UD(2,t)=0;
                     end
 
                 end
@@ -578,6 +586,8 @@ for exper_idx=1:experiment_num
                 record_traffic_SMM_UD(1,t)=transmission_first;
                 record_traffic_SRM_UD(1,t)=transmission_first;
                 record_traffic_HD_UD(1,t)=transmission_first;
+                
+                record_traffic_MAC_UD(1,t)=transmission_first;
 
                 % calculate SINR based on record traffic 
                 [record_SINR_IA_UD(:,t)]=fcn_SINR_calculate(record_traffic_IA_UD(:,t),power_transmit_AP,power_transmit_STA,channel_gain_withAP_temp,channel_gain_temp,noise_power,self_interference_channel_gain_AP);
@@ -587,6 +597,7 @@ for exper_idx=1:experiment_num
                 [record_SINR_SRM_UD(:,t)]=fcn_SINR_calculate(record_traffic_SRM_UD(:,t),power_transmit_AP,power_transmit_STA,channel_gain_withAP_temp,channel_gain_temp,noise_power,self_interference_channel_gain_AP);
                 [record_SINR_HD_UD(:,t)]=fcn_SINR_calculate(record_traffic_HD_UD(:,t),power_transmit_AP,power_transmit_STA,channel_gain_withAP_temp,channel_gain_temp,noise_power,self_interference_channel_gain_AP);
 
+                [record_SINR_MAC_UD(:,t)]=fcn_SINR_calculate(record_traffic_MAC_UD(:,t),power_transmit_AP,power_transmit_STA,channel_gain_withAP_temp,channel_gain_temp,noise_power,self_interference_channel_gain_AP);
             end             
         
             % calculate rate based on SINR and sum up with BER
@@ -619,6 +630,7 @@ for exper_idx=1:experiment_num
             ave_rate_SRM_UD(prof_idx,:)=ave_rate_SRM_UD(prof_idx,:)+fcn_rate_calculate_with_PER(record_SINR_SRM_UD, snrtable, packet_size, Target_PER);
             ave_rate_HD_UD(prof_idx,:)=ave_rate_HD_UD(prof_idx,:)+fcn_rate_calculate_with_PER(record_SINR_HD_UD, snrtable, packet_size, Target_PER);               
         
+            ave_rate_MAC_UD(prof_idx,:)=ave_rate_MAC_UD(prof_idx,:)+fcn_rate_calculate_with_PER(record_SINR_MAC_UD, snrtable, packet_size, Target_PER);
         
             % calculate rate based on SINR and sum up
             %ave_rate_IA_DU(k,:)=ave_rate_IA_DU(k,:)+fcn_rate_calculate(record_SINR_IA_DU);
@@ -667,7 +679,7 @@ for exper_idx=1:experiment_num
         ave_rate_SRM_UD(prof_idx,:)=ave_rate_SRM_UD(prof_idx,:)/Monte_Carlo_T;
         ave_rate_HD_UD(prof_idx,:)=ave_rate_HD_UD(prof_idx,:)/Monte_Carlo_T;
 
-
+        ave_rate_MAC_UD(prof_idx,:)=ave_rate_MAC_UD(prof_idx,:)/Monte_Carlo_T;
 
 
         
@@ -677,7 +689,7 @@ for exper_idx=1:experiment_num
     
     
     ave_rate_DU_with_channelgain=[ave_rate_IA_DU ave_rate_IM_DU ave_rate_SM_DU ave_rate_SMM_DU ave_rate_SRM_DU ave_rate_HD_DU ave_rate_MAC_DU]; 
-    ave_rate_UD_with_channelgain=[ave_rate_IA_UD ave_rate_IM_UD ave_rate_SM_UD ave_rate_SMM_UD ave_rate_SRM_UD ave_rate_HD_UD];
+    ave_rate_UD_with_channelgain=[ave_rate_IA_UD ave_rate_IM_UD ave_rate_SM_UD ave_rate_SMM_UD ave_rate_SRM_UD ave_rate_HD_UD ave_rate_MAC_UD];
 
     ave_rate_DU_MAC_Power_Fair=[ave_rate_MAC_Power_Fair_1db_NoHistory_DU ave_rate_MAC_Power_Fair_2db_NoHistory_DU ave_rate_MAC_Power_Fair_3db_NoHistory_DU ave_rate_MAC_Power_Fair_1db_History_DU ave_rate_MAC_Power_Fair_2db_History_DU ave_rate_MAC_Power_Fair_3db_History_DU];
     ave_rate_DU_MAC_Power_UnFair=[ave_rate_MAC_Power_UnFair_1db_NoHistory_DU ave_rate_MAC_Power_UnFair_2db_NoHistory_DU ave_rate_MAC_Power_UnFair_3db_NoHistory_DU ave_rate_MAC_Power_UnFair_1db_History_DU ave_rate_MAC_Power_UnFair_2db_History_DU ave_rate_MAC_Power_UnFair_3db_History_DU];
